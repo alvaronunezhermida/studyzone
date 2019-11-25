@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Study Zone</string>
+    <string name="splash_icon_cd">splash_icon</string>
 </resources>
