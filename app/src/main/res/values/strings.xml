@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Study Zone</string>
     <string name="splash_icon_cd">splash_icon</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Contraseña</string>
+    <string name="action_sign_in_short">action sign in short</string>
+    <string name="action_sign_in">Loguearse o Registrarse</string>
 </resources>
