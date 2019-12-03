@@ -3,6 +3,12 @@
     <string name="splash_icon_cd">splash_icon</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Contraseña</string>
+    <string name="prompt_confirm_password">Confirmar contraseña</string>
     <string name="action_sign_in_short">action sign in short</string>
-    <string name="action_sign_in">Loguearse o Registrarse</string>
+    <string name="action_sign_in">Loguearse</string>
+    <string name="google_sign">Entrar con Google</string>
+    <string name="action_sign_up">¿Todavía no tienes cuenta? <u>Regístrate</u></string>
+    <string name="action_sign_up_short">Regístrate</string>
+    <string name="prompt_username">Nombre</string>
+    <string name="prompt_lastname">Apellidos</string>
 </resources>
