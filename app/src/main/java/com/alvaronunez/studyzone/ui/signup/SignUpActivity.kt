@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.alvaronunez.studyzone.MainActivity
 import com.alvaronunez.studyzone.R
 import com.alvaronunez.studyzone.data.model.AuthRepository
-import com.alvaronunez.studyzone.data.model.CreateUserResult
 import com.alvaronunez.studyzone.data.model.DatabaseRepository
 import com.alvaronunez.studyzone.data.model.UserDTO
 import kotlinx.android.synthetic.main.activity_sign_up.*
@@ -45,44 +44,44 @@ class SignUpActivity : AppCompatActivity() {
     private fun signUp(email: String, pass: String) {
         val username = userName.text.toString()
         val lastName = lastName.text.toString()
-        var failed = false
         loading.visibility = View.VISIBLE
         authRepository.signUpNewUser(email, pass, "$username $lastName") { result ->
-            when (result) {
-                CreateUserResult.SUCCESS -> {
-                    authRepository.getCurrentUser()?.let { currentUser ->
-                        databaseRepository.saveUserDB(
-                            currentUser.uid,
-                            UserDTO(username, lastName, email)
-                        ) { result ->
-                            if (result) {
-                                loading.visibility = View.GONE
-                                Toast.makeText(
-                                    this,
-                                    "${currentUser.displayName} registrado!",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                                startActivity<MainActivity>()
-                                finish()
-                            } else {
-                                failed = true
-                            }
+            result.onSuccess {
+                it.user?.let { currentUser ->
+                    databaseRepository.saveUserDB(
+                        currentUser.uid,
+                        UserDTO(username, lastName, email)
+                    ) { result ->
+                        result.onSuccess {
+                            loading.visibility = View.GONE
+                            Toast.makeText(
+                                this,
+                                "${currentUser.displayName} registrado!",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            startActivity<MainActivity>()
+                            finish()
                         }
-                    }?: run {
-                        failed = true
+                        result.onFailure {
+                            saveUserFailed()
+                        }
                     }
-                }
-                CreateUserResult.FAILED -> failed = true
-                CreateUserResult.EMAIL_BADLY_FORMATTED -> {
-                    userEmail.error = "Formato inválido"
-                    failed = true
+                }?: run {
+                    saveUserFailed()
                 }
             }
-            if (failed) {
+            result.onFailure {
+                //TODO: Controlar email inválido
+                //userEmail.error = "Formato inválido"
                 loading.visibility = View.GONE
                 Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun saveUserFailed() {
+        authRepository.removeCurrentUser()
+        Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
     }
 
     private fun isValidEmail(email: String): Boolean {
