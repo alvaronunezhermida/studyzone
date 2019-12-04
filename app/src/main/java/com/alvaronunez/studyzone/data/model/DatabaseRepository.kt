@@ -11,12 +11,12 @@ class DatabaseRepository {
 
     private val db = FirebaseFirestore.getInstance()
 
-    fun saveUserDB(userUID: String, user: UserDTO, callback: (Boolean) -> Unit) {
+    fun saveUserDB(userUID: String, user: UserDTO, callback: (Result<Void?>) -> Unit) {
         db.collection("users")
             .document(userUID)
             .set(user)
             .addOnCompleteListener { task ->
-                callback(task.isSuccessful)
+                callback(Result.success(task.result))
                 if(!task.isSuccessful) Log.e(LOG_TAG, task.exception?.message?: "")
             }
 

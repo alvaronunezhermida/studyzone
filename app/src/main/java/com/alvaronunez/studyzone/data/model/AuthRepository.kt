@@ -1,13 +1,9 @@
 package com.alvaronunez.studyzone.data.model
 
-import android.util.Log
 import com.google.firebase.auth.*
+import java.lang.Exception
 
 class AuthRepository {
-
-    companion object {
-        private const val LOG_TAG = "AUTH_REPO::"
-    }
 
     private val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
@@ -19,64 +15,54 @@ class AuthRepository {
 
     fun thereIsUserSigned() = mAuth.currentUser != null
 
-    fun signInWithEmailAndPassword(email: String, password: String, callback: (SignInResult) -> Unit) {
+    fun signInWithEmailAndPassword(email: String, password: String, callback: (Result<AuthResult?>) -> Unit) {
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-            if (task.isSuccessful) callback(SignInResult.SUCCESS)
+            if (task.isSuccessful) callback(Result.success(task.result))
             else {
                 when (task.exception) {
-                    is FirebaseAuthInvalidUserException -> callback(SignInResult.INVALID_USER)
-                    is FirebaseAuthInvalidCredentialsException -> callback(SignInResult.INVALID_CREDENTIALS)
-                    else -> callback(SignInResult.FAILED)
+                    is FirebaseAuthInvalidUserException -> callback(Result.failure(task.exception?: Exception())) //TODO: Espicificar error para usuario inválido
+                    is FirebaseAuthInvalidCredentialsException -> callback(Result.failure(task.exception?: Exception())) //TODO: Especificar error para credenciales inválidas
+                    else -> callback(Result.failure(task.exception?: Exception()))
                 }
             }
         }
     }
 
-    fun signInWithCredential(token: String?, success: (Boolean) -> Unit) {
-        if(!token.isNullOrBlank()) {
+    fun signInWithCredential(token: String?, callback: (Result<AuthResult?>) -> Unit) {
+        try {
             val credential = GoogleAuthProvider.getCredential(token, null)
             mAuth.signInWithCredential(credential).addOnCompleteListener { task ->
-                if(!task.isSuccessful) Log.e(LOG_TAG, task.exception?.message?: "Exception lost")
-                success(task.isSuccessful)
+                if (task.isSuccessful) callback(Result.success(task.result))
+                else callback(Result.failure(task.exception ?: Exception()))
             }
-        }else {
-            success(false)
+        }catch (e: Exception) {
+            callback(Result.failure(e))
         }
 
     }
 
-    fun signUpNewUser(email: String, password: String, displayName: String, callback: (CreateUserResult) -> Unit) {
-        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
+    fun signUpNewUser(email: String, password: String, displayName: String, callback: (Result<AuthResult>) -> Unit) {
+        mAuth.createUserWithEmailAndPassword(email, password).addOnSuccessListener { result ->
+            try {
                 val user = UserProfileChangeRequest.Builder()
                     .setDisplayName(displayName)
                     .build()
-                mAuth.currentUser?.updateProfile(user)?.addOnCompleteListener { updateTask ->
-                    if(updateTask.isSuccessful) callback(CreateUserResult.SUCCESS)
-                    else {
-                        Log.e(LOG_TAG, task.exception?.message?: "Exception lost")
-                        callback(CreateUserResult.FAILED)
-                    }
-                }?: run{
-                    Log.e(LOG_TAG, "User lost when update after sign up")
-                    callback(CreateUserResult.FAILED)
+                mAuth.currentUser?.updateProfile(user)?.addOnSuccessListener {
+                    callback(Result.success(result))
+                }?.addOnFailureListener { e ->
+                    callback(Result.failure(e))
                 }
-            } else {
-                if (task.exception?.message == "The email address is badly formatted.") callback(CreateUserResult.EMAIL_BADLY_FORMATTED)
-                else {
-                    Log.e(LOG_TAG, task.exception?.message?: "Exception lost")
-                    callback(CreateUserResult.FAILED)
-                }
+            }catch (e: Exception) {
+                callback(Result.failure(e))
             }
+        }.addOnFailureListener { e ->
+            //if (e.message == "The email address is badly formatted.") callback(Result.failure(e))//TODO: Especificar error formato email incorrecto
+            callback(Result.failure(e))
         }
 
     }
-}
 
-enum class SignInResult {
-    SUCCESS, INVALID_USER, INVALID_CREDENTIALS, FAILED
-}
-
-enum class CreateUserResult {
-    SUCCESS, FAILED, EMAIL_BADLY_FORMATTED
+    fun removeCurrentUser() {
+        mAuth.currentUser?.delete()
+    }
 }

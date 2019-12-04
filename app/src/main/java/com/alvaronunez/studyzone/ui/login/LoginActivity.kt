@@ -10,7 +10,6 @@ import com.alvaronunez.studyzone.MainActivity
 import com.alvaronunez.studyzone.R
 import com.alvaronunez.studyzone.data.model.AuthRepository
 import com.alvaronunez.studyzone.data.model.GoogleSignInRepository
-import com.alvaronunez.studyzone.data.model.SignInResult
 import com.alvaronunez.studyzone.ui.signup.SignUpActivity
 import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.startActivity
@@ -56,16 +55,17 @@ class LoginActivity : AppCompatActivity() {
                 loading.visibility = View.VISIBLE
                 authRepository.signInWithEmailAndPassword(email, pass){ result ->
                     loading.visibility = View.GONE
-                    when(result){
-                        SignInResult.SUCCESS -> {
-                            val user = authRepository.getCurrentUser()
-                            Toast.makeText(this, "${user?.displayName} logueado!", Toast.LENGTH_LONG).show()
-                            startActivity<MainActivity>()
-                            finish()
-                        }
-                        SignInResult.INVALID_USER -> Toast.makeText(this, "Tienes que registrarte primero", Toast.LENGTH_LONG).show()
-                        SignInResult.INVALID_CREDENTIALS -> Toast.makeText(this, "Credenciales inválidas", Toast.LENGTH_LONG).show()
-                        SignInResult.FAILED -> Toast.makeText(this, "Login fallido!", Toast.LENGTH_LONG).show()
+                    result.onSuccess {
+                        val user = it?.user
+                        Toast.makeText(this, "${user?.displayName} logueado!", Toast.LENGTH_LONG).show()
+                        startActivity<MainActivity>()
+                        finish()
+                    }
+                    result.onFailure {
+                        Toast.makeText(this, "Login fallido!", Toast.LENGTH_LONG).show()
+                        //TODO: Controlar estos dos casos
+                        //SignInResult.INVALID_USER -> Toast.makeText(this, "Tienes que registrarte primero", Toast.LENGTH_LONG).show()
+                        //SignInResult.INVALID_CREDENTIALS -> Toast.makeText(this, "Credenciales inválidas", Toast.LENGTH_LONG).show()
                     }
                 }
             }
@@ -89,12 +89,14 @@ class LoginActivity : AppCompatActivity() {
     private fun firebaseAuthWithGoogle(token: String) {
         authRepository.signInWithCredential(token) { result ->
             loading.visibility = View.GONE
-            if (result) {
+            result.onSuccess {
                 val user = authRepository.getCurrentUser()
-                Toast.makeText(this, "${user?.displayName} logueado con google!", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "${user?.displayName} logueado con google!", Toast.LENGTH_LONG)
+                    .show()
                 startActivity<MainActivity>()
                 finish()
-            } else {
+            }
+            result.onFailure {
                 Toast.makeText(this, "Error al logear con google!", Toast.LENGTH_LONG).show()
             }
         }
