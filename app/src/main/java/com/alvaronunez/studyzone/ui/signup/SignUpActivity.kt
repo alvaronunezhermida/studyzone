@@ -7,17 +7,18 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.alvaronunez.studyzone.MainActivity
 import com.alvaronunez.studyzone.R
+import com.alvaronunez.studyzone.data.model.AuthRepository
+import com.alvaronunez.studyzone.data.model.CreateUserResult
+import com.alvaronunez.studyzone.data.model.DatabaseRepository
 import com.alvaronunez.studyzone.data.model.UserDTO
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.UserProfileChangeRequest
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_sign_up.*
 import org.jetbrains.anko.startActivity
 
 
 class SignUpActivity : AppCompatActivity() {
 
-    private val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val authRepository : AuthRepository by lazy { AuthRepository() }
+    private val databaseRepository : DatabaseRepository by lazy { DatabaseRepository() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,57 +43,46 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun signUp(email: String, pass: String) {
-        loading.visibility = View.VISIBLE
-        mAuth.createUserWithEmailAndPassword(email, pass)
-            .addOnCompleteListener(
-                this
-            ) { task ->
-                if (task.isSuccessful) {
-                    updateUserData()
-                } else {
-                    loading.visibility = View.GONE
-                    if(task.exception?.message == "The email address is badly formatted.") userEmail.error = "Formato inválido"
-                    Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
-                }
-            }
-    }
-
-    private fun updateUserData(){
         val username = userName.text.toString()
         val lastName = lastName.text.toString()
-        val user = mAuth.currentUser
-        val profileUpdates = UserProfileChangeRequest.Builder()
-            .setDisplayName("$username $lastName")
-            .build()
-        user?.updateProfile(profileUpdates)?.addOnCompleteListener { task ->
-            if(task.isSuccessful){
-                Toast.makeText(this, "${user?.displayName} registrado!", Toast.LENGTH_LONG).show()
-                writeNewUser(user.uid, lastName, username, user.email)
-            }else{
-                loading.visibility = View.GONE
-                Toast.makeText(this, "Error al actualizar usuario!", Toast.LENGTH_SHORT).show()
+        var failed = false
+        loading.visibility = View.VISIBLE
+        authRepository.signUpNewUser(email, pass, "$username $lastName") { result ->
+            when (result) {
+                CreateUserResult.SUCCESS -> {
+                    authRepository.getCurrentUser()?.let { currentUser ->
+                        databaseRepository.saveUserDB(
+                            currentUser.uid,
+                            UserDTO(username, lastName, email)
+                        ) { result ->
+                            if (result) {
+                                loading.visibility = View.GONE
+                                Toast.makeText(
+                                    this,
+                                    "${currentUser.displayName} registrado!",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                startActivity<MainActivity>()
+                                finish()
+                            } else {
+                                failed = true
+                            }
+                        }
+                    }?: run {
+                        failed = true
+                    }
+                }
+                CreateUserResult.FAILED -> failed = true
+                CreateUserResult.EMAIL_BADLY_FORMATTED -> {
+                    userEmail.error = "Formato inválido"
+                    failed = true
+                }
             }
-        }?: run {
-            loading.visibility = View.GONE
-            Toast.makeText(this, "Se ha perdido el usuario!", Toast.LENGTH_LONG).show()
+            if (failed) {
+                loading.visibility = View.GONE
+                Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
+            }
         }
-    }
-
-    private fun writeNewUser(userId: String, lastName: String?, name: String, email: String?) {
-        val database = FirebaseFirestore.getInstance()
-        val user = UserDTO(name, lastName, email)
-        database.collection("users")
-            .add(user)
-            .addOnSuccessListener { documentReference ->
-                loading.visibility = View.GONE
-                Toast.makeText(this, "DocumentSnapshot added with ID: " + documentReference.id, Toast.LENGTH_LONG).show()
-                startActivity<MainActivity>()
-                finish()
-            }
-            .addOnFailureListener { e ->
-                loading.visibility = View.GONE
-                Toast.makeText(this, "Error adding document", Toast.LENGTH_LONG).show()
-            }
     }
 
     private fun isValidEmail(email: String): Boolean {
