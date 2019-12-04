@@ -1,33 +1,59 @@
 package com.alvaronunez.studyzone.ui.signup
 
 import android.os.Bundle
-import android.util.Patterns
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.alvaronunez.studyzone.MainActivity
 import com.alvaronunez.studyzone.R
-import com.alvaronunez.studyzone.data.model.AuthRepository
-import com.alvaronunez.studyzone.data.model.DatabaseRepository
-import com.alvaronunez.studyzone.data.model.UserDTO
 import kotlinx.android.synthetic.main.activity_sign_up.*
 import org.jetbrains.anko.startActivity
 
 
-class SignUpActivity : AppCompatActivity() {
+class SignUpActivity : AppCompatActivity(), SignUpPresenter.View {
 
-    private val authRepository : AuthRepository by lazy { AuthRepository() }
-    private val databaseRepository : DatabaseRepository by lazy { DatabaseRepository() }
+    private val presenter by lazy { SignUpPresenter() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
+        presenter.onCreate(this)
+    }
 
+    override fun onDestroy() {
+        presenter.onDestroy()
+        super.onDestroy()
+    }
+
+    private fun isFormValid(): Boolean {
+        if (!presenter.isValidName(userName.text.toString())) {
+            userName.error = "Campo vacío"
+            return false
+        }
+        if (!presenter.isValidEmail(userEmail.text.toString())) {
+            userEmail.error = "Formato inválido"
+            return false
+        }
+        if(!presenter.isValidPassword(etPassword.text.toString())){
+            etPassword.error = "Mínimo 6 caracteres"
+            return false
+        }
+        if (!presenter.isValidConfirmedPassword(etPassword.text.toString(), etConfirmPassword.text.toString())){
+            etConfirmPassword.error = "No coincide con la contraseña"
+            return false
+        }
+        return true
+    }
+
+    override fun setListeners() {
         sign_up.setOnClickListener {
             if (isFormValid()){
-                val email = userEmail.text.toString()
-                val pass = etPassword.text.toString()
-                signUp(email, pass)
+                presenter.onSignUpClicked(
+                    userEmail.text.toString(),
+                    etPassword.text.toString(),
+                    userName.text.toString(),
+                    lastName.text.toString()
+                )
             }
         }
 
@@ -41,82 +67,20 @@ class SignUpActivity : AppCompatActivity() {
         etConfirmPassword.onFocusChangeListener = focusListener
     }
 
-    private fun signUp(email: String, pass: String) {
-        val username = userName.text.toString()
-        val lastName = lastName.text.toString()
+    override fun showProgress() {
         loading.visibility = View.VISIBLE
-        authRepository.signUpNewUser(email, pass, "$username $lastName") { result ->
-            result.onSuccess {
-                it.user?.let { currentUser ->
-                    databaseRepository.saveUserDB(
-                        currentUser.uid,
-                        UserDTO(username, lastName, email)
-                    ) { result ->
-                        result.onSuccess {
-                            loading.visibility = View.GONE
-                            Toast.makeText(
-                                this,
-                                "${currentUser.displayName} registrado!",
-                                Toast.LENGTH_LONG
-                            ).show()
-                            startActivity<MainActivity>()
-                            finish()
-                        }
-                        result.onFailure {
-                            saveUserFailed()
-                        }
-                    }
-                }?: run {
-                    saveUserFailed()
-                }
-            }
-            result.onFailure {
-                //TODO: Controlar email inválido
-                //userEmail.error = "Formato inválido"
-                loading.visibility = View.GONE
-                Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
-    private fun saveUserFailed() {
-        authRepository.removeCurrentUser()
-        Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
+    override fun hideProgress() {
+        loading.visibility = View.GONE
     }
 
-    private fun isValidEmail(email: String): Boolean {
-        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    override fun showMessage(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
-    private fun isValidName(name: String): Boolean {
-        return name != ""
-    }
-
-    private fun isValidPassword(password: String): Boolean {
-        return password.length > 5
-    }
-
-    private fun isValidConfirmedPassword(password: String, confirmedPassword: String): Boolean {
-        return password == confirmedPassword
-    }
-
-    private fun isFormValid(): Boolean {
-        if (!isValidName(userName.text.toString())) {
-            userName.error = "Campo vacío"
-            return false
-        }
-        if (!isValidEmail(userEmail.text.toString())) {
-            userEmail.error = "Formato inválido"
-            return false
-        }
-        if(!isValidPassword(etPassword.text.toString())){
-            etPassword.error = "Mínimo 6 caracteres"
-            return false
-        }
-        if (!isValidConfirmedPassword(etPassword.text.toString(), etConfirmPassword.text.toString())){
-            etConfirmPassword.error = "No coincide con la contraseña"
-            return false
-        }
-        return true
+    override fun navigateToMain() {
+        startActivity<MainActivity>()
+        finish()
     }
 }
