@@ -3,13 +3,13 @@ package com.alvaronunez.studyzone
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import com.alvaronunez.studyzone.data.model.AuthRepository
 import com.alvaronunez.studyzone.ui.login.LoginActivity
-import com.google.firebase.auth.FirebaseAuth
 import org.jetbrains.anko.startActivity
 
 class SplashActivity : AppCompatActivity() {
 
-    private val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val authRepository : AuthRepository by lazy { AuthRepository() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,9 +19,9 @@ class SplashActivity : AppCompatActivity() {
 
     private fun waitAndGoToMain() {
         Handler().postDelayed({
-            mAuth.currentUser?.let {
+            if(authRepository.thereIsUserSigned()){
                 startActivity<MainActivity>()
-            }?: run {
+            }else{
                 startActivity<LoginActivity>()
             }
             finish()
