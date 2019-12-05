@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.alvaronunez.studyzone.MainActivity
+import com.alvaronunez.studyzone.ui.main.MainActivity
 import com.alvaronunez.studyzone.R
 import com.alvaronunez.studyzone.ui.signup.SignUpActivity
 import kotlinx.android.synthetic.main.activity_login.*

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.Handler
 import com.alvaronunez.studyzone.data.model.AuthRepository
 import com.alvaronunez.studyzone.ui.login.LoginActivity
+import com.alvaronunez.studyzone.ui.main.MainActivity
 import org.jetbrains.anko.startActivity
 
 class SplashActivity : AppCompatActivity() {

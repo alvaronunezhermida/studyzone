@@ -21,4 +21,21 @@ class DatabaseRepository {
             }
 
     }
+
+    fun getItemsByUser(userId: String?, callback: (Result<List<ItemDTO>>) -> Unit) {
+        val userRef = db.document("users/$userId")
+        db.collection("items")
+            .whereEqualTo("userId", userRef)
+            .get()
+            .addOnSuccessListener { documents ->
+                val items: MutableList<ItemDTO> = mutableListOf()
+                documents.forEach { document ->
+                    items.add(document.toObject(ItemDTO::class.java).withUid(document.id))
+                }
+                callback(Result.success(items))
+            }
+            .addOnFailureListener { exception ->
+                callback(Result.failure(exception))
+            }
+    }
 }
