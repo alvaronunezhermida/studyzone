@@ -7,8 +7,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.alvaronunez.studyzone.data.model.AuthRepository
 import com.alvaronunez.studyzone.data.model.DatabaseRepository
 import com.alvaronunez.studyzone.data.model.ItemDTO
+import com.alvaronunez.studyzone.ui.common.Scope
+import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
+class MainViewModel : ViewModel(), Scope by Scope.Impl() {
 
     private val _model = MutableLiveData<UiModel>()
     val model: LiveData<UiModel>
@@ -28,13 +30,16 @@ class MainViewModel : ViewModel() {
         object Finish : UiModel()
     }
 
+    init {
+        initScope()
+    }
+
     private fun refresh() {
         _model.value = UiModel.Loading
-        databaseRepository.getItemsByUser(authRepository.getCurrentUser()?.uid){ result ->
-            result.onSuccess { itemList ->
-                _model.value = UiModel.Content(itemList)
-            }
-            result.onFailure {
+        launch {
+            databaseRepository.getItemsByUser(authRepository.getCurrentUser()?.uid)?.let { items ->
+                _model.value = UiModel.Content(items)
+            }?: run {
                 _model.value = UiModel.Message("Error al leer datos!")
             }
         }
@@ -48,6 +53,11 @@ class MainViewModel : ViewModel() {
         authRepository.signOut()
         _model.value = UiModel.Message("Sesión cerrada")
         _model.value = UiModel.Finish
+    }
+
+    override fun onCleared() {
+        destroyScope()
+        super.onCleared()
     }
 }
 

@@ -4,51 +4,63 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.alvaronunez.studyzone.ui.main.MainActivity
 import com.alvaronunez.studyzone.R
+import com.alvaronunez.studyzone.ui.signup.SignUpViewModel.UiModel
 import kotlinx.android.synthetic.main.activity_sign_up.*
 import org.jetbrains.anko.startActivity
 
 
-class SignUpActivity : AppCompatActivity(), SignUpPresenter.View {
+class SignUpActivity : AppCompatActivity() {
 
-    private val presenter by lazy { SignUpPresenter() }
+    private lateinit var viewModel: SignUpViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
-        presenter.onCreate(this)
-    }
+        viewModel = ViewModelProviders.of(
+            this,
+            SignUpViewModelFactory())[SignUpViewModel::class.java]
 
-    override fun onDestroy() {
-        presenter.onDestroy()
-        super.onDestroy()
+        viewModel.model.observe(this, Observer(::updateUi))
     }
 
     private fun isFormValid(): Boolean {
-        if (!presenter.isValidName(userName.text.toString())) {
+        if (!viewModel.isValidName(userName.text.toString())) {
             userName.error = "Campo vacío"
             return false
         }
-        if (!presenter.isValidEmail(userEmail.text.toString())) {
+        if (!viewModel.isValidEmail(userEmail.text.toString())) {
             userEmail.error = "Formato inválido"
             return false
         }
-        if(!presenter.isValidPassword(etPassword.text.toString())){
+        if(!viewModel.isValidPassword(etPassword.text.toString())){
             etPassword.error = "Mínimo 6 caracteres"
             return false
         }
-        if (!presenter.isValidConfirmedPassword(etPassword.text.toString(), etConfirmPassword.text.toString())){
+        if (!viewModel.isValidConfirmedPassword(etPassword.text.toString(), etConfirmPassword.text.toString())){
             etConfirmPassword.error = "No coincide con la contraseña"
             return false
         }
         return true
     }
 
-    override fun setListeners() {
+    private fun updateUi(model: UiModel) {
+        loading.visibility = if (model is UiModel.Loading) View.VISIBLE else View.GONE
+        when (model) {
+            is UiModel.Message -> Toast.makeText(this, model.message, Toast.LENGTH_LONG).show()
+            is UiModel.NavigateToMain -> {
+                startActivity<MainActivity>()
+                finish()
+            }
+
+        }
+
         sign_up.setOnClickListener {
             if (isFormValid()){
-                presenter.onSignUpClicked(
+                viewModel.onSignUpClicked(
                     userEmail.text.toString(),
                     etPassword.text.toString(),
                     userName.text.toString(),
@@ -65,22 +77,5 @@ class SignUpActivity : AppCompatActivity(), SignUpPresenter.View {
         userEmail.onFocusChangeListener = focusListener
         etPassword.onFocusChangeListener = focusListener
         etConfirmPassword.onFocusChangeListener = focusListener
-    }
-
-    override fun showProgress() {
-        loading.visibility = View.VISIBLE
-    }
-
-    override fun hideProgress() {
-        loading.visibility = View.GONE
-    }
-
-    override fun showMessage(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-    }
-
-    override fun navigateToMain() {
-        startActivity<MainActivity>()
-        finish()
     }
 }

@@ -2,6 +2,8 @@ package com.alvaronunez.studyzone.data.model
 
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
+import java.lang.Exception
 
 class DatabaseRepository {
 
@@ -22,20 +24,13 @@ class DatabaseRepository {
 
     }
 
-    fun getItemsByUser(userId: String?, callback: (Result<List<ItemDTO>>) -> Unit) {
-        val userRef = db.document("users/$userId")
-        db.collection("items")
-            .whereEqualTo("userId", userRef)
-            .get()
-            .addOnSuccessListener { documents ->
-                val items: MutableList<ItemDTO> = mutableListOf()
-                documents.forEach { document ->
-                    items.add(document.toObject(ItemDTO::class.java).withUid(document.id))
-                }
-                callback(Result.success(items))
-            }
-            .addOnFailureListener { exception ->
-                callback(Result.failure(exception))
-            }
-    }
+    suspend fun getItemsByUser(userId: String?): List<ItemDTO>? =
+        try {
+            val userRef = db.document("users/$userId")
+            val documents = db.collection("items").whereEqualTo("userId", userRef).get().await()
+            documents.toObjects(ItemDTO::class.java)
+        }catch (e: Exception) {
+            null
+        }
+
 }

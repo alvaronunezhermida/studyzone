@@ -2,46 +2,49 @@ package com.alvaronunez.studyzone.ui.login
 
 import android.content.Intent
 import android.util.Patterns
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.alvaronunez.studyzone.R
 import com.alvaronunez.studyzone.data.model.AuthRepository
 import com.alvaronunez.studyzone.data.model.GoogleSignInRepository
 
-class LoginPresenter {
+class LoginViewModel : ViewModel() {
 
-    interface View {
-        fun setListeners()
-        fun showProgress()
-        fun hideProgress()
-        fun showMessage(message: String)
-        fun loginWithGoogle(googleIntent: Intent)
-        fun navigateToSignUp()
-        fun navigateToMain()
-    }
+    private val _model = MutableLiveData<UiModel>()
+    val model: LiveData<UiModel>
+        get() {
+            if (_model.value == null) _model.value = UiModel.NoState
+            return _model
+        }
 
     private val authRepository : AuthRepository by lazy { AuthRepository() }
     private val googleSignInRepository : GoogleSignInRepository by lazy { GoogleSignInRepository() }
-    private var view: View? = null
 
-    fun onCreate(view: View) {
-        this.view = view
-        view.setListeners()
+    sealed class UiModel {
+        object NoState : UiModel()
+        object Loading : UiModel()
+        class Message(val message: String) : UiModel()
+        object NavigateToMain : UiModel()
+        object NavigateToSignUp : UiModel()
+        class LoginWithGoogle(val intent: Intent) : UiModel()
     }
 
 
     fun onSignUpClicked() {
-        view?.navigateToSignUp()
+        _model.value = UiModel.NavigateToSignUp
     }
 
     fun onLoginClicked(email: String, password: String) {
-        view?.showProgress()
+        _model.value = UiModel.Loading
         authRepository.signInWithEmailAndPassword(email, password){ result ->
-            view?.hideProgress()
             result.onSuccess {
-                view?.showMessage("${it?.user?.displayName} logueado!")
-                view?.navigateToMain()
+                _model.value = UiModel.Message("${it?.user?.displayName} logueado!")
+                _model.value = UiModel.NavigateToMain
             }
             result.onFailure {
-                view?.showMessage("Login fallido!")
+                _model.value = UiModel.Message("Login fallido!")
                 //TODO: Controlar estos dos casos
                 //SignInResult.INVALID_USER -> Toast.makeText(this, "Tienes que registrarte primero", Toast.LENGTH_LONG).show()
                 //SignInResult.INVALID_CREDENTIALS -> Toast.makeText(this, "Credenciales inválidas", Toast.LENGTH_LONG).show()
@@ -60,31 +63,31 @@ class LoginPresenter {
     fun fromGoogleSignInResult(data: Intent?) {
         googleSignInRepository.getSignedAccountTokenFromIntent(data)?.let{ token ->
             authRepository.signInWithCredential(token) { result ->
-                view?.hideProgress()
+                _model.value = UiModel.Loading
                 result.onSuccess {
                     val user = authRepository.getCurrentUser()
-                    view?.showMessage("${user?.displayName} logueado con google!")
-                    view?.navigateToMain()
+                    _model.value = UiModel.Message("${user?.displayName} logueado con google!")
+                    _model.value = UiModel.NavigateToMain
                 }
                 result.onFailure {
-                    view?.showMessage("Error al logear con google!")
+                    _model.value = UiModel.Message("Error al logear con google!")
                 }
             }
         }?: run{
-            view?.hideProgress()
-            view?.showMessage("Google sign in failed")
+            _model.value = UiModel.Message("Google sign in failed")
         }
     }
 
     fun onGoogleLoginClicked(activity: LoginActivity) {
-        view?.showProgress()
-        view?.loginWithGoogle(googleSignInRepository.getGoogleSignInIntent(activity, activity.getString(R.string.default_web_client_id)))
+        _model.value = UiModel.Loading
+        _model.value = UiModel.LoginWithGoogle(googleSignInRepository.getGoogleSignInIntent(activity, activity.getString(R.string.default_web_client_id)))
     }
 
-    fun onDestroy() {
-        this.view = null
-    }
+}
 
-
-
+@Suppress("UNCHECKED_CAST")
+class LoginViewModelFactory :
+    ViewModelProvider.Factory {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T =
+        LoginViewModel() as T
 }
