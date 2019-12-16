@@ -24,6 +24,9 @@ class MainViewModel : ViewModel(), Scope by Scope.Impl() {
     private val authRepository : AuthRepository by lazy { AuthRepository() }
 
     sealed class UiModel {
+        object OpenFabs : UiModel()
+        object CloseFabs : UiModel()
+        object NavigateToCreateItem : UiModel()
         object Loading : UiModel()
         class Content(val items: List<ItemDTO>) : UiModel()
         class Message(val message: String) : UiModel()
@@ -45,6 +48,10 @@ class MainViewModel : ViewModel(), Scope by Scope.Impl() {
         }
     }
 
+    fun resume(){
+        refresh()
+    }
+
     fun onItemClicked(item: ItemDTO) {
         _model.value = UiModel.Message("${item.title} clicked!")
     }
@@ -58,6 +65,14 @@ class MainViewModel : ViewModel(), Scope by Scope.Impl() {
     override fun onCleared() {
         destroyScope()
         super.onCleared()
+    }
+
+    fun onFabClicked() {
+        _model.value = if(_model.value == UiModel.OpenFabs) UiModel.CloseFabs else UiModel.OpenFabs
+    }
+
+    fun onFabItemClicked() {
+        _model.value = UiModel.NavigateToCreateItem
     }
 }
 

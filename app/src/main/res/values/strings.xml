@@ -12,4 +12,7 @@
     <string name="prompt_username">Nombre</string>
     <string name="prompt_lastname">Apellidos</string>
     <string name="sign_out">Cerrar sesión</string>
+    <string name="prompt_item_title">Título</string>
+    <string name="prompt_item_description">Descripción</string>
+    <string name="action_add_item">Añadir</string>
 </resources>

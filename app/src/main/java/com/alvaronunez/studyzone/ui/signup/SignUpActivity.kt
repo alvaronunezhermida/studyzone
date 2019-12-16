@@ -20,11 +20,34 @@ class SignUpActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
+        setListeners()
         viewModel = ViewModelProviders.of(
             this,
             SignUpViewModelFactory())[SignUpViewModel::class.java]
 
         viewModel.model.observe(this, Observer(::updateUi))
+    }
+
+    private fun setListeners() {
+        sign_up.setOnClickListener {
+            if (isFormValid()){
+                viewModel.onSignUpClicked(
+                    userEmail.text.toString(),
+                    etPassword.text.toString(),
+                    userName.text.toString(),
+                    lastName.text.toString()
+                )
+            }
+        }
+
+        val focusListener = View.OnFocusChangeListener { _, hasFocus ->
+            if(!hasFocus) isFormValid()
+        }
+
+        userName.onFocusChangeListener = focusListener
+        userEmail.onFocusChangeListener = focusListener
+        etPassword.onFocusChangeListener = focusListener
+        etConfirmPassword.onFocusChangeListener = focusListener
     }
 
     private fun isFormValid(): Boolean {
@@ -57,25 +80,5 @@ class SignUpActivity : AppCompatActivity() {
             }
 
         }
-
-        sign_up.setOnClickListener {
-            if (isFormValid()){
-                viewModel.onSignUpClicked(
-                    userEmail.text.toString(),
-                    etPassword.text.toString(),
-                    userName.text.toString(),
-                    lastName.text.toString()
-                )
-            }
-        }
-
-        val focusListener = View.OnFocusChangeListener { v, hasFocus ->
-            if(!hasFocus) isFormValid()
-        }
-
-        userName.onFocusChangeListener = focusListener
-        userEmail.onFocusChangeListener = focusListener
-        etPassword.onFocusChangeListener = focusListener
-        etConfirmPassword.onFocusChangeListener = focusListener
     }
 }

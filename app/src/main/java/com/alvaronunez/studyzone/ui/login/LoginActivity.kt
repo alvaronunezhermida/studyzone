@@ -81,7 +81,7 @@ class LoginActivity : AppCompatActivity() {
             if(isFormValid()) viewModel.onLoginClicked(userEmail.text.toString(), etPassword.text.toString())
         }
 
-        val focusListener = View.OnFocusChangeListener { v, hasFocus ->
+        val focusListener = View.OnFocusChangeListener { _, hasFocus ->
             if(!hasFocus) isFormValid()
         }
 

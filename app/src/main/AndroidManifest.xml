@@ -13,6 +13,7 @@
         <activity android:name=".ui.signup.SignUpActivity"></activity>
         <activity android:name=".ui.login.LoginActivity" />
         <activity android:name=".ui.main.MainActivity" />
+        <activity android:name=".ui.createitem.CreateItemActivity" />
         <activity
             android:name=".SplashActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">

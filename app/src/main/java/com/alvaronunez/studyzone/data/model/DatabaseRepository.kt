@@ -1,6 +1,7 @@
 package com.alvaronunez.studyzone.data.model
 
 import android.util.Log
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
@@ -32,5 +33,30 @@ class DatabaseRepository {
         }catch (e: Exception) {
             null
         }
+
+    suspend fun getCategoriesByUser(userId: String?): List<CategoryDTO>? =
+        try {
+            val userRef = db.document("users/$userId")
+            val documents = db.collection("categories").get().await()
+            documents.toObjects(CategoryDTO::class.java)
+        }catch (e: Exception) {
+            null
+        }
+
+    fun getUserById(userId: String?): DocumentReference? =
+        try {
+            db.document("users/$userId")
+        }catch (e: Exception){
+            null
+        }
+
+    suspend fun addItem(item: HashMap<String, *>): Boolean? =
+        try {
+            db.collection("items").add(item).await()
+            true
+        } catch (e: Exception) {
+            false
+        }
+
 
 }
