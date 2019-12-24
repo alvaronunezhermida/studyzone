@@ -19,18 +19,29 @@ class MainViewModel : ViewModel(), Scope by Scope.Impl() {
             return _model
         }
 
+    private val _fabsModel = MutableLiveData<FabsModel>()
+    val fabsModel: LiveData<FabsModel>
+        get() {
+            if (_fabsModel.value == null) FabsModel.Closed
+            return _fabsModel
+        }
+
+
 
     private val databaseRepository : DatabaseRepository by lazy { DatabaseRepository() }
     private val authRepository : AuthRepository by lazy { AuthRepository() }
 
     sealed class UiModel {
-        object OpenFabs : UiModel()
-        object CloseFabs : UiModel()
         object NavigateToCreateItem : UiModel()
         object Loading : UiModel()
         class Content(val items: List<ItemDTO>) : UiModel()
         class Message(val message: String) : UiModel()
         object Finish : UiModel()
+    }
+
+    sealed class FabsModel {
+        object Opened : FabsModel()
+        object Closed : FabsModel()
     }
 
     init {
@@ -68,7 +79,8 @@ class MainViewModel : ViewModel(), Scope by Scope.Impl() {
     }
 
     fun onFabClicked() {
-        _model.value = if(_model.value == UiModel.OpenFabs) UiModel.CloseFabs else UiModel.OpenFabs
+        val areOpened = _fabsModel.value == FabsModel.Opened
+        _fabsModel.value = if(areOpened) FabsModel.Closed else FabsModel.Opened
     }
 
     fun onFabItemClicked() {

@@ -9,26 +9,35 @@ import androidx.lifecycle.ViewModelProvider
 import com.alvaronunez.studyzone.R
 import com.alvaronunez.studyzone.data.model.AuthRepository
 import com.alvaronunez.studyzone.data.model.GoogleSignInRepository
+import com.alvaronunez.studyzone.ui.common.isValidEmail
+import com.alvaronunez.studyzone.ui.common.isValidName
+import com.alvaronunez.studyzone.ui.common.isValidPassword
 
 class LoginViewModel : ViewModel() {
 
     private val _model = MutableLiveData<UiModel>()
     val model: LiveData<UiModel>
-        get() {
-            if (_model.value == null) _model.value = UiModel.NoState
-            return _model
-        }
+        get() = _model
+
+    private val _formModel = MutableLiveData<FormModel>()
+    val formModel: LiveData<FormModel>
+        get() = _formModel
 
     private val authRepository : AuthRepository by lazy { AuthRepository() }
     private val googleSignInRepository : GoogleSignInRepository by lazy { GoogleSignInRepository() }
 
     sealed class UiModel {
-        object NoState : UiModel()
         object Loading : UiModel()
         class Message(val message: String) : UiModel()
         object NavigateToMain : UiModel()
         object NavigateToSignUp : UiModel()
         class LoginWithGoogle(val intent: Intent) : UiModel()
+        class Content(val email: String, val password: String) : UiModel()
+    }
+
+    sealed class FormModel {
+        class Email(val error: String) : FormModel()
+        class Password(val error: String) : FormModel()
     }
 
 
@@ -52,12 +61,21 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    fun isValidEmail(email: String): Boolean {
-        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    }
-
-    fun isValidPassword(password: String): Boolean {
-        return password.length > 5
+    fun isFormValid(email: String, password: String): Boolean {
+        return when {
+            !isValidEmail(email) -> {
+                _formModel.value = FormModel.Email("Formato inválido")
+                false
+            }
+            !isValidPassword(password) -> {
+                _formModel.value = FormModel.Password("Mínimo 6 caracteres")
+                false
+            }
+            else ->{
+                _model.value = UiModel.Content(email, password)
+                true
+            }
+        }
     }
 
     fun fromGoogleSignInResult(data: Intent?) {

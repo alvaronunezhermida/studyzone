@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.alvaronunez.studyzone.R
 import com.alvaronunez.studyzone.ui.createitem.CreateItemActivity
 import com.alvaronunez.studyzone.ui.main.MainViewModel.UiModel
+import com.alvaronunez.studyzone.ui.main.MainViewModel.FabsModel
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.startActivity
 
@@ -25,14 +26,7 @@ class MainActivity : AppCompatActivity(){
         setContentView(R.layout.activity_main)
 
         setListeners()
-
-        viewModel = ViewModelProviders.of(
-            this,
-            MainViewModelFactory())[MainViewModel::class.java]
-
-            adapter = ItemsAdapter(viewModel::onItemClicked)
-            recycler.adapter = adapter
-        viewModel.model.observe(this, Observer(::updateUi))
+        viewModelSetUp()
     }
 
     override fun onResume() {
@@ -43,6 +37,17 @@ class MainActivity : AppCompatActivity(){
     private fun setListeners() {
         fab.setOnClickListener{ viewModel.onFabClicked() }
         fab_item.setOnClickListener { viewModel.onFabItemClicked() }
+    }
+
+    private fun viewModelSetUp() {
+        viewModel = ViewModelProviders.of(
+            this,
+            MainViewModelFactory())[MainViewModel::class.java]
+
+        adapter = ItemsAdapter(viewModel::onItemClicked)
+        recycler.adapter = adapter
+        viewModel.model.observe(this, Observer(::updateUi))
+        viewModel.fabsModel.observe(this, Observer(::updateFabs))
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -62,30 +67,25 @@ class MainActivity : AppCompatActivity(){
         when (model) {
             is UiModel.Content -> adapter.items = model.items
             is UiModel.Message -> Toast.makeText(this, model.message, Toast.LENGTH_LONG).show()
-            is UiModel.OpenFabs -> openFabs()
-            is UiModel.CloseFabs -> closeFabs()
             is UiModel.Finish -> finish()
             is UiModel.NavigateToCreateItem -> startActivity<CreateItemActivity>()
         }
     }
 
-    private fun closeFabs() {
-        val fabClose = AnimationUtils.loadAnimation(this, R.anim.fab_close)
-        val fabRClocwise = AnimationUtils.loadAnimation(this, R.anim.rotate_clockwise)
-        fab_item.startAnimation(fabClose)
-        fab_image.startAnimation(fabClose)
-        fab_audio.startAnimation(fabClose)
-        fab_file.startAnimation(fabClose)
-        fab.startAnimation(fabRClocwise)
+    private fun updateFabs(fabsModel: FabsModel) {
+        when(fabsModel){
+            is FabsModel.Closed -> animateFabs(R.anim.rotate_clockwise, R.anim.fab_close)
+            is FabsModel.Opened -> animateFabs(R.anim.rotate_anticlockwise, R.anim.fab_open)
+        }
     }
 
-    private fun openFabs() {
-        val fabOpen = AnimationUtils.loadAnimation(this, R.anim.fab_open)
-        val fabRAntiClockwise = AnimationUtils.loadAnimation(this, R.anim.rotate_anticlockwise)
-        fab_item.startAnimation(fabOpen)
-        fab_image.startAnimation(fabOpen)
-        fab_audio.startAnimation(fabOpen)
-        fab_file.startAnimation(fabOpen)
-        fab.startAnimation(fabRAntiClockwise)
+    private fun animateFabs(mainFabAnimRes: Int, fabsAnimRes: Int) {
+        val mainFabAnim = AnimationUtils.loadAnimation(this, mainFabAnimRes)
+        val fabsAnim = AnimationUtils.loadAnimation(this, fabsAnimRes)
+        fab.startAnimation(mainFabAnim)
+        fab_item.startAnimation(fabsAnim)
+        fab_image.startAnimation(fabsAnim)
+        fab_audio.startAnimation(fabsAnim)
+        fab_file.startAnimation(fabsAnim)
     }
 }

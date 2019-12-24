@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.alvaronunez.studyzone.ui.main.MainActivity
 import com.alvaronunez.studyzone.R
 import com.alvaronunez.studyzone.ui.signup.SignUpViewModel.UiModel
+import com.alvaronunez.studyzone.ui.signup.SignUpViewModel.FormModel
 import kotlinx.android.synthetic.main.activity_sign_up.*
 import org.jetbrains.anko.startActivity
 
@@ -21,53 +22,35 @@ class SignUpActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
         setListeners()
+        viewModelSetUp()
+    }
+
+    private fun setListeners() {
+        sign_up.setOnClickListener {
+            val userEmail = userEmail.text.toString()
+            val password = etPassword.text.toString()
+            val userName = userName.text.toString()
+            val confirmPassword = etConfirmPassword.text.toString()
+            viewModel.isFormValid(userEmail,userName,password,confirmPassword)
+        }
+    }
+
+    private fun viewModelSetUp() {
         viewModel = ViewModelProviders.of(
             this,
             SignUpViewModelFactory())[SignUpViewModel::class.java]
 
         viewModel.model.observe(this, Observer(::updateUi))
+        viewModel.formModel.observe(this, Observer(::updateFormError))
     }
 
-    private fun setListeners() {
-        sign_up.setOnClickListener {
-            if (isFormValid()){
-                viewModel.onSignUpClicked(
-                    userEmail.text.toString(),
-                    etPassword.text.toString(),
-                    userName.text.toString(),
-                    lastName.text.toString()
-                )
-            }
+    private fun updateFormError(formModel: FormModel) {
+        when(formModel){
+            is FormModel.Email -> userEmail.error = formModel.error
+            is FormModel.Name -> userName.error = formModel.error
+            is FormModel.Password -> etPassword.error = formModel.error
+            is FormModel.ConfirmPassword -> etConfirmPassword.error = formModel.error
         }
-
-        val focusListener = View.OnFocusChangeListener { _, hasFocus ->
-            if(!hasFocus) isFormValid()
-        }
-
-        userName.onFocusChangeListener = focusListener
-        userEmail.onFocusChangeListener = focusListener
-        etPassword.onFocusChangeListener = focusListener
-        etConfirmPassword.onFocusChangeListener = focusListener
-    }
-
-    private fun isFormValid(): Boolean {
-        if (!viewModel.isValidName(userName.text.toString())) {
-            userName.error = "Campo vacío"
-            return false
-        }
-        if (!viewModel.isValidEmail(userEmail.text.toString())) {
-            userEmail.error = "Formato inválido"
-            return false
-        }
-        if(!viewModel.isValidPassword(etPassword.text.toString())){
-            etPassword.error = "Mínimo 6 caracteres"
-            return false
-        }
-        if (!viewModel.isValidConfirmedPassword(etPassword.text.toString(), etConfirmPassword.text.toString())){
-            etConfirmPassword.error = "No coincide con la contraseña"
-            return false
-        }
-        return true
     }
 
     private fun updateUi(model: UiModel) {
@@ -78,7 +61,7 @@ class SignUpActivity : AppCompatActivity() {
                 startActivity<MainActivity>()
                 finish()
             }
-
+            is UiModel.Content -> viewModel.onSignUpClicked(model.user, lastName.text.toString())
         }
     }
 }

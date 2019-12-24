@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.alvaronunez.studyzone.ui.login.LoginViewModel.UiModel
+import com.alvaronunez.studyzone.ui.login.LoginViewModel.FormModel
 import com.alvaronunez.studyzone.R
 import com.alvaronunez.studyzone.ui.main.MainActivity
 import com.alvaronunez.studyzone.ui.signup.SignUpActivity
@@ -28,19 +29,37 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         setListeners()
-        viewModel = ViewModelProviders.of(
-            this,
-            LoginViewModelFactory())[LoginViewModel::class.java]
-
-        viewModel.model.observe(this, Observer(::updateUi))
+        viewModelSetUp()
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == RC_SIGN_IN) {
             viewModel.fromGoogleSignInResult(data)
         }
+    }
+
+    private fun setListeners() {
+        google_login.setOnClickListener {
+            viewModel.onGoogleLoginClicked(this)
+        }
+
+        sign_up.setOnClickListener {
+            viewModel.onSignUpClicked()
+        }
+
+        login.setOnClickListener {
+            viewModel.isFormValid(userEmail.text.toString(), etPassword.text.toString())
+        }
+    }
+
+    private fun viewModelSetUp() {
+        viewModel = ViewModelProviders.of(
+            this,
+            LoginViewModelFactory())[LoginViewModel::class.java]
+
+        viewModel.model.observe(this, Observer(::updateUi))
+        viewModel.formModel.observe(this, Observer(::updateFormError))
     }
 
     private fun updateUi(model: UiModel) {
@@ -53,39 +72,14 @@ class LoginActivity : AppCompatActivity() {
             }
             is UiModel.NavigateToSignUp -> startActivity<SignUpActivity>()
             is UiModel.LoginWithGoogle -> startActivityForResult(model.intent, RC_SIGN_IN)
+            is UiModel.Content -> viewModel.onLoginClicked(model.email, model.password)
         }
     }
 
-    private fun isFormValid(): Boolean {
-        if (!viewModel.isValidEmail(userEmail.text.toString())) {
-            userEmail.error = "Formato inválido"
-            return false
+    private fun updateFormError(formModel: FormModel) {
+        when(formModel){
+            is FormModel.Email -> userEmail.error = formModel.error
+            is FormModel.Password -> etPassword.error = formModel.error
         }
-        if (!viewModel.isValidPassword(etPassword.text.toString())) {
-            etPassword.error = "Mínimo 6 caracteres"
-            return false
-        }
-        return true
-    }
-
-    fun setListeners() {
-        google_login.setOnClickListener {
-            viewModel.onGoogleLoginClicked(this)
-        }
-
-        sign_up.setOnClickListener {
-            viewModel.onSignUpClicked()
-        }
-
-        login.setOnClickListener {
-            if(isFormValid()) viewModel.onLoginClicked(userEmail.text.toString(), etPassword.text.toString())
-        }
-
-        val focusListener = View.OnFocusChangeListener { _, hasFocus ->
-            if(!hasFocus) isFormValid()
-        }
-
-        userEmail.onFocusChangeListener = focusListener
-        etPassword.onFocusChangeListener = focusListener
     }
 }
