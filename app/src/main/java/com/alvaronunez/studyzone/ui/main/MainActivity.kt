@@ -5,26 +5,49 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.alvaronunez.studyzone.R
-import com.alvaronunez.studyzone.data.model.ItemDTO
+import com.alvaronunez.studyzone.ui.createitem.CreateItemActivity
+import com.alvaronunez.studyzone.ui.main.MainViewModel.UiModel
+import com.alvaronunez.studyzone.ui.main.MainViewModel.FabsModel
 import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.startActivity
 
-class MainActivity : AppCompatActivity(), MainPresenter.View {
+class MainActivity : AppCompatActivity(){
 
-    private val presenter by lazy { MainPresenter() }
-    private val adapter = ItemsAdapter(presenter::onItemClicked)
+    private lateinit var viewModel: MainViewModel
+    private lateinit var adapter : ItemsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        presenter.onCreate(this)
-        recycler.adapter = adapter
+
+        setListeners()
+        viewModelSetUp()
     }
 
-    override fun onDestroy() {
-        presenter.onDestroy()
-        super.onDestroy()
+    override fun onResume() {
+        super.onResume()
+        viewModel.resume()
+    }
+
+    private fun setListeners() {
+        fab.setOnClickListener{ viewModel.onFabClicked() }
+        fab_item.setOnClickListener { viewModel.onFabItemClicked() }
+    }
+
+    private fun viewModelSetUp() {
+        viewModel = ViewModelProviders.of(
+            this,
+            MainViewModelFactory())[MainViewModel::class.java]
+
+        adapter = ItemsAdapter(viewModel::onItemClicked)
+        recycler.adapter = adapter
+        viewModel.model.observe(this, Observer(::updateUi))
+        viewModel.fabsModel.observe(this, Observer(::updateFabs))
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -34,28 +57,35 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.menu_sign_up -> presenter.onSignOutClicked()
+            R.id.menu_sign_up -> viewModel.onSignOutClicked()
         }
         return false
     }
 
-    override fun finishActivity() {
-        finish()
+    private fun updateUi(model: UiModel) {
+        loading.visibility = if (model is UiModel.Loading) View.VISIBLE else View.GONE
+        when (model) {
+            is UiModel.Content -> adapter.items = model.items
+            is UiModel.Message -> Toast.makeText(this, model.message, Toast.LENGTH_LONG).show()
+            is UiModel.Finish -> finish()
+            is UiModel.NavigateToCreateItem -> startActivity<CreateItemActivity>()
+        }
     }
 
-    override fun showMessage(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    private fun updateFabs(fabsModel: FabsModel) {
+        when(fabsModel){
+            is FabsModel.Closed -> animateFabs(R.anim.rotate_clockwise, R.anim.fab_close)
+            is FabsModel.Opened -> animateFabs(R.anim.rotate_anticlockwise, R.anim.fab_open)
+        }
     }
 
-    override fun showProgress() {
-        loading.visibility = View.VISIBLE
-    }
-
-    override fun hideProgress() {
-        loading.visibility = View.GONE
-    }
-
-    override fun updateData(items: List<ItemDTO>) {
-        adapter.items = items
+    private fun animateFabs(mainFabAnimRes: Int, fabsAnimRes: Int) {
+        val mainFabAnim = AnimationUtils.loadAnimation(this, mainFabAnimRes)
+        val fabsAnim = AnimationUtils.loadAnimation(this, fabsAnimRes)
+        fab.startAnimation(mainFabAnim)
+        fab_item.startAnimation(fabsAnim)
+        fab_image.startAnimation(fabsAnim)
+        fab_audio.startAnimation(fabsAnim)
+        fab_file.startAnimation(fabsAnim)
     }
 }

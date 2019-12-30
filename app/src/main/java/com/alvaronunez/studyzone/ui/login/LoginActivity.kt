@@ -5,8 +5,12 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.alvaronunez.studyzone.ui.main.MainActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import com.alvaronunez.studyzone.ui.login.LoginViewModel.UiModel
+import com.alvaronunez.studyzone.ui.login.LoginViewModel.FormModel
 import com.alvaronunez.studyzone.R
+import com.alvaronunez.studyzone.ui.main.MainActivity
 import com.alvaronunez.studyzone.ui.signup.SignUpActivity
 import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.startActivity
@@ -14,85 +18,69 @@ import org.jetbrains.anko.startActivity
 
 class LoginActivity : AppCompatActivity(), LoginPresenter.View {
 
-    private val presenter by lazy { LoginPresenter() }
-
     companion object {
         private const val RC_SIGN_IN = 9001
     }
 
+    private lateinit var viewModel: LoginViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        presenter.onCreate(this)
-    }
 
-    override fun onDestroy() {
-        presenter.onDestroy()
-        super.onDestroy()
+        setListeners()
+        viewModelSetUp()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == RC_SIGN_IN) {
-            presenter.fromGoogleSignInResult(data)
+            viewModel.fromGoogleSignInResult(data)
         }
     }
 
-    private fun isFormValid(): Boolean {
-        if (!presenter.isValidEmail(userEmail.text.toString())) {
-            userEmail.error = "Formato inválido"
-            return false
-        }
-        if (!presenter.isValidPassword(etPassword.text.toString())) {
-            etPassword.error = "Mínimo 6 caracteres"
-            return false
-        }
-        return true
-    }
-
-    override fun setListeners() {
+  
+    private fun setListeners() {
         google_login.setOnClickListener {
-            presenter.onGoogleLoginClicked(this)
+            viewModel.onGoogleLoginClicked(this)
         }
 
         sign_up.setOnClickListener {
-            presenter.onSignUpClicked()
+            viewModel.onSignUpClicked()
         }
 
         login.setOnClickListener {
-            if(isFormValid()) presenter.onLoginClicked(userEmail.text.toString(), etPassword.text.toString())
+            viewModel.isFormValid(userEmail.text.toString(), etPassword.text.toString())
         }
+    }
 
-        val focusListener = View.OnFocusChangeListener { v, hasFocus ->
-            if(!hasFocus) isFormValid()
+    private fun viewModelSetUp() {
+        viewModel = ViewModelProviders.of(
+            this,
+            LoginViewModelFactory())[LoginViewModel::class.java]
+
+        viewModel.model.observe(this, Observer(::updateUi))
+        viewModel.formModel.observe(this, Observer(::updateFormError))
+    }
+
+    private fun updateUi(model: UiModel) {
+        loading.visibility = if (model is UiModel.Loading) View.VISIBLE else View.GONE
+        when (model) {
+            is UiModel.Message -> Toast.makeText(this, model.message, Toast.LENGTH_LONG).show()
+            is UiModel.NavigateToMain -> {
+                startActivity<MainActivity>()
+                finish()
+            }
+            is UiModel.NavigateToSignUp -> startActivity<SignUpActivity>()
+            is UiModel.LoginWithGoogle -> startActivityForResult(model.intent, RC_SIGN_IN)
+            is UiModel.Content -> viewModel.onLoginClicked(model.email, model.password)
         }
-
-        userEmail.onFocusChangeListener = focusListener
-        etPassword.onFocusChangeListener = focusListener
     }
 
-    override fun showProgress() {
-        loading.visibility = View.VISIBLE
-    }
-
-    override fun hideProgress() {
-        loading.visibility = View.GONE
-    }
-
-    override fun showMessage(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-    }
-
-    override fun loginWithGoogle(googleIntent: Intent) {
-        startActivityForResult(googleIntent, RC_SIGN_IN)
-    }
-
-    override fun navigateToSignUp() {
-        startActivity<SignUpActivity>()
-    }
-
-    override fun navigateToMain() {
-        startActivity<MainActivity>()
-        finish()
+    private fun updateFormError(formModel: FormModel) {
+        when(formModel){
+            is FormModel.Email -> userEmail.error = formModel.error
+            is FormModel.Password -> etPassword.error = formModel.error
+        }
     }
 }
