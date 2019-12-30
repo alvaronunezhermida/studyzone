@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.startActivity
 
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity(), LoginPresenter.View {
 
     companion object {
         private const val RC_SIGN_IN = 9001
@@ -39,6 +39,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+  
     private fun setListeners() {
         google_login.setOnClickListener {
             viewModel.onGoogleLoginClicked(this)

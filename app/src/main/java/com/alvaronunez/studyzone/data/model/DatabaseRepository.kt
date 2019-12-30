@@ -57,6 +57,4 @@ class DatabaseRepository {
         } catch (e: Exception) {
             false
         }
-
-
 }
