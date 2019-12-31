@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.activity_sign_up.*
 import org.jetbrains.anko.startActivity
 
 
-class SignUpActivity : AppCompatActivity(), SignUpPresenter.View {
+class SignUpActivity : AppCompatActivity() {
 
     private lateinit var viewModel: SignUpViewModel
 
