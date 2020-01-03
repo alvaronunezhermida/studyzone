@@ -7,37 +7,37 @@ import androidx.lifecycle.ViewModelProvider
 import com.alvaronunez.studyzone.data.model.AuthRepository
 import com.alvaronunez.studyzone.data.model.DatabaseRepository
 import com.alvaronunez.studyzone.data.model.ItemDTO
+import com.alvaronunez.studyzone.ui.common.Event
 import com.alvaronunez.studyzone.ui.common.Scope
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel(), Scope by Scope.Impl() {
 
-    private val _model = MutableLiveData<UiModel>()
-    val model: LiveData<UiModel>
-        get() {
-            if (_model.value == null) refresh()
-            return _model
-        }
+    private val _items = MutableLiveData<List<ItemDTO>>()
+    val items: LiveData<List<ItemDTO>> get() = _items
 
-    private val _fabsModel = MutableLiveData<FabsModel>()
-    val fabsModel: LiveData<FabsModel>
-        get() {
-            if (_fabsModel.value == null) FabsModel.Closed
-            return _fabsModel
-        }
+    private val _loading = MutableLiveData<Boolean>()
+    val loading: LiveData<Boolean> get() = _loading
 
+    private val _message = MutableLiveData<String>()
+    val message: LiveData<String> get() = _message
+
+    private val _finish = MutableLiveData<Event<Unit>>()
+    val finish: LiveData<Event<Unit>> get() = _finish
+
+    private val _navigateToCreateItem = MutableLiveData<Event<Unit>>()
+    val navigateToCreateItem: LiveData<Event<Unit>> get() = _navigateToCreateItem
+
+    private val _areFabsOpened = MutableLiveData<Boolean>()
+    val areFabsOpened: LiveData<Boolean>
+        get() {
+            if(_areFabsOpened.value == null) _areFabsOpened.value = false
+            return _areFabsOpened
+        }
 
 
     private val databaseRepository : DatabaseRepository by lazy { DatabaseRepository() }
     private val authRepository : AuthRepository by lazy { AuthRepository() }
-
-    sealed class UiModel {
-        object NavigateToCreateItem : UiModel()
-        object Loading : UiModel()
-        class Content(val items: List<ItemDTO>) : UiModel()
-        class Message(val message: String) : UiModel()
-        object Finish : UiModel()
-    }
 
     sealed class FabsModel {
         object Opened : FabsModel()
@@ -46,31 +46,25 @@ class MainViewModel : ViewModel(), Scope by Scope.Impl() {
 
     init {
         initScope()
-    }
-
-    private fun refresh() {
-        _model.value = UiModel.Loading
-        launch {
-            databaseRepository.getItemsByUser(authRepository.getCurrentUser()?.uid)?.let { items ->
-                _model.value = UiModel.Content(items)
-            }?: run {
-                _model.value = UiModel.Message("Error al leer datos!")
-            }
-        }
-    }
-
-    fun resume(){
         refresh()
     }
 
+    private fun refresh() {
+        launch {
+            _loading.value = true
+            _items.value = databaseRepository.getItemsByUser(authRepository.getCurrentUser()?.uid)
+            _loading.value = false
+        }
+    }
+
     fun onItemClicked(item: ItemDTO) {
-        _model.value = UiModel.Message("${item.title} clicked!")
+        _message.value = "${item.title} clicked!"
     }
 
     fun onSignOutClicked() {
         authRepository.signOut()
-        _model.value = UiModel.Message("Sesión cerrada")
-        _model.value = UiModel.Finish
+        _message.value = "Sesión cerrada"
+        _finish.value = Event(Unit)
     }
 
     override fun onCleared() {
@@ -79,12 +73,12 @@ class MainViewModel : ViewModel(), Scope by Scope.Impl() {
     }
 
     fun onFabClicked() {
-        val areOpened = _fabsModel.value == FabsModel.Opened
-        _fabsModel.value = if(areOpened) FabsModel.Closed else FabsModel.Opened
+        val areOpened: Boolean = _areFabsOpened.value?:false
+        _areFabsOpened.value = areOpened.not()
     }
 
     fun onFabItemClicked() {
-        _model.value = UiModel.NavigateToCreateItem
+        _navigateToCreateItem.value = Event(Unit)
     }
 }
 

@@ -4,9 +4,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlin.properties.Delegates
+
+fun <T : ViewDataBinding> ViewGroup.bindingInflate(
+    @LayoutRes layoutRes: Int,
+    attachToRoot: Boolean = true
+): T =
+    DataBindingUtil.inflate(LayoutInflater.from(context), layoutRes, this, attachToRoot)
 
 fun ViewGroup.inflate(@LayoutRes layoutRes: Int, attachToRoot: Boolean = true): View =
     LayoutInflater.from(context).inflate(layoutRes, this, attachToRoot)

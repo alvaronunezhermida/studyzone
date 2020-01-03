@@ -4,15 +4,14 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.view.animation.AnimationUtils
-import android.widget.Toast
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.alvaronunez.studyzone.R
+import com.alvaronunez.studyzone.databinding.ActivityMainBinding
+import com.alvaronunez.studyzone.ui.common.EventObserver
 import com.alvaronunez.studyzone.ui.createitem.CreateItemActivity
-import com.alvaronunez.studyzone.ui.main.MainViewModel.UiModel
-import com.alvaronunez.studyzone.ui.main.MainViewModel.FabsModel
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.startActivity
 
@@ -23,31 +22,33 @@ class MainActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        setListeners()
-        viewModelSetUp()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.resume()
-    }
-
-    private fun setListeners() {
-        fab.setOnClickListener{ viewModel.onFabClicked() }
-        fab_item.setOnClickListener { viewModel.onFabItemClicked() }
-    }
-
-    private fun viewModelSetUp() {
         viewModel = ViewModelProviders.of(
             this,
             MainViewModelFactory())[MainViewModel::class.java]
 
+        val binding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding.viewmodel = viewModel
+        binding.lifecycleOwner = this
+
         adapter = ItemsAdapter(viewModel::onItemClicked)
-        recycler.adapter = adapter
-        viewModel.model.observe(this, Observer(::updateUi))
-        viewModel.fabsModel.observe(this, Observer(::updateFabs))
+        binding.recycler.adapter = adapter
+
+        setUpObservers()
+    }
+
+    private fun setUpObservers() {
+        viewModel.finish.observe(this, EventObserver {
+            finish()
+        })
+
+        viewModel.navigateToCreateItem.observe(this, EventObserver{
+            startActivity<CreateItemActivity>()
+        })
+
+        viewModel.areFabsOpened.observe(this, Observer { areFabsOpened ->
+            if(areFabsOpened) animateFabs(R.anim.rotate_clockwise, R.anim.fab_close)
+            else animateFabs(R.anim.rotate_anticlockwise, R.anim.fab_open)
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -60,23 +61,6 @@ class MainActivity : AppCompatActivity(){
             R.id.menu_sign_up -> viewModel.onSignOutClicked()
         }
         return false
-    }
-
-    private fun updateUi(model: UiModel) {
-        loading.visibility = if (model is UiModel.Loading) View.VISIBLE else View.GONE
-        when (model) {
-            is UiModel.Content -> adapter.items = model.items
-            is UiModel.Message -> Toast.makeText(this, model.message, Toast.LENGTH_LONG).show()
-            is UiModel.Finish -> finish()
-            is UiModel.NavigateToCreateItem -> startActivity<CreateItemActivity>()
-        }
-    }
-
-    private fun updateFabs(fabsModel: FabsModel) {
-        when(fabsModel){
-            is FabsModel.Closed -> animateFabs(R.anim.rotate_clockwise, R.anim.fab_close)
-            is FabsModel.Opened -> animateFabs(R.anim.rotate_anticlockwise, R.anim.fab_open)
-        }
     }
 
     private fun animateFabs(mainFabAnimRes: Int, fabsAnimRes: Int) {
