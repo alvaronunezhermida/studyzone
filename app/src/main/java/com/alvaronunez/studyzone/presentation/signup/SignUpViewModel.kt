@@ -1,16 +1,16 @@
-package com.alvaronunez.studyzone.ui.signup
+package com.alvaronunez.studyzone.presentation.signup
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.alvaronunez.studyzone.data.model.AuthRepository
-import com.alvaronunez.studyzone.data.model.DatabaseRepository
+import com.alvaronunez.studyzone.data.AuthRepository
+import com.alvaronunez.studyzone.data.DatabaseRepository
 import com.alvaronunez.studyzone.data.model.UserDTO
-import com.alvaronunez.studyzone.ui.common.isValidConfirmedPassword
-import com.alvaronunez.studyzone.ui.common.isValidEmail
-import com.alvaronunez.studyzone.ui.common.isValidName
-import com.alvaronunez.studyzone.ui.common.isValidPassword
+import com.alvaronunez.studyzone.presentation.common.isValidConfirmedPassword
+import com.alvaronunez.studyzone.presentation.common.isValidEmail
+import com.alvaronunez.studyzone.presentation.common.isValidName
+import com.alvaronunez.studyzone.presentation.common.isValidPassword
 
 class SignUpViewModel : ViewModel() {
 

@@ -1,4 +1,4 @@
-package com.alvaronunez.studyzone.ui.signup
+package com.alvaronunez.studyzone.presentation.signup
 
 import android.os.Bundle
 import android.view.View
@@ -6,10 +6,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.alvaronunez.studyzone.ui.main.MainActivity
+import com.alvaronunez.studyzone.presentation.main.MainActivity
 import com.alvaronunez.studyzone.R
-import com.alvaronunez.studyzone.ui.signup.SignUpViewModel.UiModel
-import com.alvaronunez.studyzone.ui.signup.SignUpViewModel.FormModel
+import com.alvaronunez.studyzone.presentation.signup.SignUpViewModel.UiModel
+import com.alvaronunez.studyzone.presentation.signup.SignUpViewModel.FormModel
 import kotlinx.android.synthetic.main.activity_sign_up.*
 import org.jetbrains.anko.startActivity
 

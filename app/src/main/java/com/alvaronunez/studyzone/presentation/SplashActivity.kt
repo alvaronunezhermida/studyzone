@@ -1,11 +1,12 @@
-package com.alvaronunez.studyzone
+package com.alvaronunez.studyzone.presentation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
-import com.alvaronunez.studyzone.data.model.AuthRepository
-import com.alvaronunez.studyzone.ui.login.LoginActivity
-import com.alvaronunez.studyzone.ui.main.MainActivity
+import com.alvaronunez.studyzone.R
+import com.alvaronunez.studyzone.data.AuthRepository
+import com.alvaronunez.studyzone.presentation.login.LoginActivity
+import com.alvaronunez.studyzone.presentation.main.MainActivity
 import org.jetbrains.anko.startActivity
 
 class SplashActivity : AppCompatActivity() {

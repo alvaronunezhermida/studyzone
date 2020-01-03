@@ -1,4 +1,4 @@
-package com.alvaronunez.studyzone.ui.common
+package com.alvaronunez.studyzone.presentation.common
 
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope

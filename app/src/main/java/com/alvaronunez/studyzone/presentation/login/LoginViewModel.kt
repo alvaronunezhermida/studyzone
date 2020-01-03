@@ -1,17 +1,15 @@
-package com.alvaronunez.studyzone.ui.login
+package com.alvaronunez.studyzone.presentation.login
 
 import android.content.Intent
-import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.alvaronunez.studyzone.R
-import com.alvaronunez.studyzone.data.model.AuthRepository
-import com.alvaronunez.studyzone.data.model.GoogleSignInRepository
-import com.alvaronunez.studyzone.ui.common.isValidEmail
-import com.alvaronunez.studyzone.ui.common.isValidName
-import com.alvaronunez.studyzone.ui.common.isValidPassword
+import com.alvaronunez.studyzone.data.AuthRepository
+import com.alvaronunez.studyzone.data.GoogleSignInRepository
+import com.alvaronunez.studyzone.presentation.common.isValidEmail
+import com.alvaronunez.studyzone.presentation.common.isValidPassword
 
 class LoginViewModel : ViewModel() {
 

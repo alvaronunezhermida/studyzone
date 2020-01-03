@@ -1,13 +1,13 @@
-package com.alvaronunez.studyzone.ui.createitem
+package com.alvaronunez.studyzone.presentation.createitem
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.alvaronunez.studyzone.data.model.AuthRepository
+import com.alvaronunez.studyzone.data.AuthRepository
 import com.alvaronunez.studyzone.data.model.CategoryDTO
-import com.alvaronunez.studyzone.data.model.DatabaseRepository
-import com.alvaronunez.studyzone.ui.common.Scope
+import com.alvaronunez.studyzone.data.DatabaseRepository
+import com.alvaronunez.studyzone.presentation.common.Scope
 import kotlinx.coroutines.launch
 
 class CreateItemViewModel : ViewModel(), Scope by Scope.Impl() {

@@ -1,4 +1,4 @@
-package com.alvaronunez.studyzone.data.model
+package com.alvaronunez.studyzone.data
 import android.app.Activity
 import android.content.Intent
 import android.util.Log

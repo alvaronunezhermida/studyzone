@@ -1,4 +1,4 @@
-package com.alvaronunez.studyzone.ui.createitem
+package com.alvaronunez.studyzone.presentation.createitem
 
 import android.os.Bundle
 import android.view.View
@@ -7,9 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.alvaronunez.studyzone.R
-import com.alvaronunez.studyzone.ui.createitem.CreateItemViewModel.UiModel
+import com.alvaronunez.studyzone.presentation.createitem.CreateItemViewModel.UiModel
 import kotlinx.android.synthetic.main.activity_create_item.*
-import kotlinx.android.synthetic.main.view_category.*
 
 class CreateItemActivity : AppCompatActivity() {
 
