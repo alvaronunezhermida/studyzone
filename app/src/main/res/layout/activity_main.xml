@@ -1,90 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.main.MainActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler"
+    <data>
+        <variable
+            name="viewmodel"
+            type="com.alvaronunez.studyzone.ui.main.MainViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+        tools:context=".ui.main.MainActivity">
 
-    <ProgressBar
-        android:id="@+id/loading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/recycler"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:items="@{viewmodel.items}"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="12dp"
-        android:src="@drawable/ic_create_new_folder_white"
-        android:visibility="invisible"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toTopOf="@+id/fab_file"
-        app:layout_constraintEnd_toEndOf="@+id/fab_file"
-        app:layout_constraintStart_toStartOf="@+id/fab_file"
-        app:pressedTranslationZ="12dp" />
+        <ProgressBar
+            android:id="@+id/loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            app:visible="@{viewmodel.loading}"
+            app:layout_constraintBottom_toBottomOf="@+id/recycler"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_file"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="12dp"
-        android:src="@drawable/ic_attach_file_white"
-        android:visibility="invisible"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toTopOf="@+id/fab_audio"
-        app:layout_constraintEnd_toEndOf="@+id/fab_audio"
-        app:layout_constraintStart_toStartOf="@+id/fab_audio"
-        app:pressedTranslationZ="12dp" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:src="@drawable/ic_create_new_folder_white"
+            android:visibility="invisible"
+            app:fabSize="mini"
+            app:layout_constraintBottom_toTopOf="@+id/fab_file"
+            app:layout_constraintEnd_toEndOf="@+id/fab_file"
+            app:layout_constraintStart_toStartOf="@+id/fab_file"
+            app:pressedTranslationZ="12dp"
+            android:onClick="@{() -> viewmodel.onFabItemClicked()}"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_audio"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="12dp"
-        android:src="@drawable/ic_camera_white"
-        android:visibility="invisible"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toTopOf="@+id/fab_image"
-        app:layout_constraintEnd_toEndOf="@+id/fab_image"
-        app:layout_constraintStart_toStartOf="@+id/fab_image"
-        app:pressedTranslationZ="12dp" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_file"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:src="@drawable/ic_attach_file_white"
+            android:visibility="invisible"
+            app:fabSize="mini"
+            app:layout_constraintBottom_toTopOf="@+id/fab_audio"
+            app:layout_constraintEnd_toEndOf="@+id/fab_audio"
+            app:layout_constraintStart_toStartOf="@+id/fab_audio"
+            app:pressedTranslationZ="12dp" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="12dp"
-        android:src="@drawable/ic_mic_white"
-        android:visibility="invisible"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toTopOf="@+id/fab"
-        app:layout_constraintEnd_toEndOf="@+id/fab"
-        app:layout_constraintStart_toStartOf="@+id/fab"
-        app:pressedTranslationZ="12dp" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_audio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:src="@drawable/ic_camera_white"
+            android:visibility="invisible"
+            app:fabSize="mini"
+            app:layout_constraintBottom_toTopOf="@+id/fab_image"
+            app:layout_constraintEnd_toEndOf="@+id/fab_image"
+            app:layout_constraintStart_toStartOf="@+id/fab_image"
+            app:pressedTranslationZ="12dp" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="12dp"
-        android:src="@drawable/ic_add_white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:pressedTranslationZ="12dp" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:src="@drawable/ic_mic_white"
+            android:visibility="invisible"
+            app:fabSize="mini"
+            app:layout_constraintBottom_toTopOf="@+id/fab"
+            app:layout_constraintEnd_toEndOf="@+id/fab"
+            app:layout_constraintStart_toStartOf="@+id/fab"
+            app:pressedTranslationZ="12dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:src="@drawable/ic_add_white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:pressedTranslationZ="12dp"
+            android:onClick="@{() -> viewmodel.onFabItemClicked()}" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
