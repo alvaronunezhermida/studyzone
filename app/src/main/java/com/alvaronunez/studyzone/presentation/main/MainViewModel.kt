@@ -1,14 +1,14 @@
-package com.alvaronunez.studyzone.ui.main
+package com.alvaronunez.studyzone.presentation.main
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.alvaronunez.studyzone.data.model.AuthRepository
-import com.alvaronunez.studyzone.data.model.DatabaseRepository
+import com.alvaronunez.studyzone.data.AuthRepository
+import com.alvaronunez.studyzone.data.DatabaseRepository
 import com.alvaronunez.studyzone.data.model.ItemDTO
-import com.alvaronunez.studyzone.ui.common.Event
-import com.alvaronunez.studyzone.ui.common.Scope
+import com.alvaronunez.studyzone.presentation.common.Scope
+import com.alvaronunez.studyzone.presentation.common.Event
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel(), Scope by Scope.Impl() {

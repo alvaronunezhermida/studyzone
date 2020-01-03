@@ -1,6 +1,9 @@
-package com.alvaronunez.studyzone.data.model
+package com.alvaronunez.studyzone.data
 
 import android.util.Log
+import com.alvaronunez.studyzone.data.model.CategoryDTO
+import com.alvaronunez.studyzone.data.model.ItemDTO
+import com.alvaronunez.studyzone.data.model.UserDTO
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await

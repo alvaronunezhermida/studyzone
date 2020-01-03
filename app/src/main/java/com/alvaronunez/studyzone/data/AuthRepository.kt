@@ -1,4 +1,4 @@
-package com.alvaronunez.studyzone.data.model
+package com.alvaronunez.studyzone.data
 
 import com.google.firebase.auth.*
 import java.lang.Exception

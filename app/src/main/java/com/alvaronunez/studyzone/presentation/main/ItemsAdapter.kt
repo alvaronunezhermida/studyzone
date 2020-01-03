@@ -1,12 +1,12 @@
-package com.alvaronunez.studyzone.ui.main
+package com.alvaronunez.studyzone.presentation.main
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.alvaronunez.studyzone.R
 import com.alvaronunez.studyzone.data.model.ItemDTO
 import com.alvaronunez.studyzone.databinding.ViewItemBinding
-import com.alvaronunez.studyzone.ui.common.basicDiffUtil
-import com.alvaronunez.studyzone.ui.common.bindingInflate
+import com.alvaronunez.studyzone.presentation.common.basicDiffUtil
+import com.alvaronunez.studyzone.presentation.common.bindingInflate
 
 class ItemsAdapter (private val listener: (ItemDTO) -> Unit) :
     RecyclerView.Adapter<ItemsAdapter.ViewHolder>() {

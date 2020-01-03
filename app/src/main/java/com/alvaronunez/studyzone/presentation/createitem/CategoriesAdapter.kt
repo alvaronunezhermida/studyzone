@@ -1,14 +1,13 @@
-package com.alvaronunez.studyzone.ui.createitem
+package com.alvaronunez.studyzone.presentation.createitem
 
 import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.alvaronunez.studyzone.R
 import com.alvaronunez.studyzone.data.model.CategoryDTO
-import com.alvaronunez.studyzone.ui.common.basicDiffUtil
-import com.alvaronunez.studyzone.ui.common.inflate
+import com.alvaronunez.studyzone.presentation.common.basicDiffUtil
+import com.alvaronunez.studyzone.presentation.common.inflate
 import kotlinx.android.synthetic.main.view_category.view.*
 
 class CategoriesAdapter (private val listener: (CategoryDTO) -> Unit) :
