@@ -28,11 +28,11 @@ class MainViewModel : ViewModel(), Scope by Scope.Impl() {
     private val _navigateToCreateItem = MutableLiveData<Event<Unit>>()
     val navigateToCreateItem: LiveData<Event<Unit>> get() = _navigateToCreateItem
 
-    private val _areFabsOpened = MutableLiveData<Boolean>()
-    val areFabsOpened: LiveData<Boolean>
+    private val _openFabs = MutableLiveData<Boolean>()
+    val openFabs: LiveData<Boolean>
         get() {
-            if(_areFabsOpened.value == null) _areFabsOpened.value = false
-            return _areFabsOpened
+            if(_openFabs.value == null) _openFabs.value = false
+            return _openFabs
         }
 
 
@@ -73,8 +73,8 @@ class MainViewModel : ViewModel(), Scope by Scope.Impl() {
     }
 
     fun onFabClicked() {
-        val areOpened: Boolean = _areFabsOpened.value?:false
-        _areFabsOpened.value = areOpened.not()
+        val openFabs: Boolean = _openFabs.value?:false
+        _openFabs.value = openFabs.not()
     }
 
     fun onFabItemClicked() {

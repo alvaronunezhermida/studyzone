@@ -45,9 +45,9 @@ class MainActivity : AppCompatActivity(){
             startActivity<CreateItemActivity>()
         })
 
-        viewModel.areFabsOpened.observe(this, Observer { areFabsOpened ->
-            if(areFabsOpened) animateFabs(R.anim.rotate_clockwise, R.anim.fab_close)
-            else animateFabs(R.anim.rotate_anticlockwise, R.anim.fab_open)
+        viewModel.openFabs.observe(this, Observer { openFabs ->
+            if(openFabs) animateFabs(R.anim.rotate_anticlockwise, R.anim.fab_open)
+            else animateFabs(R.anim.rotate_clockwise, R.anim.fab_close)
         })
     }
 
