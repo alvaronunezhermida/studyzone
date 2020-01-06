@@ -97,7 +97,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:pressedTranslationZ="12dp"
-            android:onClick="@{() -> viewmodel.onFabItemClicked()}" />
+            android:onClick="@{() -> viewmodel.onFabClicked()}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
