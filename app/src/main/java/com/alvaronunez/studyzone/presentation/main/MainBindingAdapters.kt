@@ -1,4 +1,4 @@
-package com.alvaronunez.studyzone.ui.main
+package com.alvaronunez.studyzone.presentation.main
 
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
