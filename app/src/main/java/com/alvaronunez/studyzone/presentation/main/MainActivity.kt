@@ -9,12 +9,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.alvaronunez.studyzone.R
-import com.alvaronunez.studyzone.presentation.databinding.ActivityMainBinding
+import com.alvaronunez.studyzone.databinding.ActivityMainBinding
 import com.alvaronunez.studyzone.presentation.common.EventObserver
 import com.alvaronunez.studyzone.presentation.createitem.CreateItemActivity
-import com.alvaronunez.studyzone.presentations.createitem.CreateItemActivity
-import com.alvaronunez.studyzone.presentation.main.MainViewModel.UiModel
-import com.alvaronunez.studyzone.presentation.main.MainViewModel.FabsModel
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.startActivity
 
