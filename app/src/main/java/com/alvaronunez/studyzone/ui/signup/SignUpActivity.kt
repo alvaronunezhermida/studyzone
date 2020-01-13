@@ -28,9 +28,9 @@ class SignUpActivity : AppCompatActivity() {
 
     private fun setListeners() {
         sign_up.setOnClickListener {
-            val userEmail = userEmail.text.toString()
+            val userEmail = etUserEmail.text.toString()
             val password = etPassword.text.toString()
-            val userName = userName.text.toString()
+            val userName = etUserName.text.toString()
             val confirmPassword = etConfirmPassword.text.toString()
             viewModel.isFormValid(userEmail,userName,password,confirmPassword)
         }
@@ -48,7 +48,7 @@ class SignUpActivity : AppCompatActivity() {
     private fun updateFormError(formModel: FormModel) {
         when(formModel){
             is FormModel.Email -> userEmail.error = formModel.error
-            is FormModel.Name -> userName.error = formModel.error
+            is FormModel.Name -> etUserName.error = formModel.error
             is FormModel.Password -> etPassword.error = formModel.error
             is FormModel.ConfirmPassword -> etConfirmPassword.error = formModel.error
         }
@@ -62,7 +62,7 @@ class SignUpActivity : AppCompatActivity() {
                 startActivity<MainActivity>()
                 finish()
             }
-            is UiModel.Content -> viewModel.onSignUpClicked(model.user, lastName.text.toString())
+            is UiModel.Content -> viewModel.onSignUpClicked(model.user, etLastName.text.toString())
         }
     }
 }

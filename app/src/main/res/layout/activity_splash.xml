@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
+    android:background="#FFFFFF"
     tools:context=".SplashActivity">
 
     <ImageView
         android:id="@+id/splash_icon"
         android:layout_width="300dp"
         android:layout_height="300dp"
-        android:src="@drawable/ic_launcher_foreground"
+        android:src="@drawable/ic_study_zone_logo"
         android:animateLayoutChanges="true"
         android:contentDescription="@string/splash_icon_cd"
         app:layout_constraintBottom_toBottomOf="parent"

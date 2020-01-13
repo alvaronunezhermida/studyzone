@@ -50,7 +50,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         login.setOnClickListener {
-            viewModel.isFormValid(userEmail.text.toString(), etPassword.text.toString())
+            viewModel.isFormValid(etUserEmail.text.toString(), etPassword.text.toString())
         }
     }
 
@@ -79,7 +79,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun updateFormError(formModel: FormModel) {
         when(formModel){
-            is FormModel.Email -> userEmail.error = formModel.error
+            is FormModel.Email -> etUserEmail.error = formModel.error
             is FormModel.Password -> etPassword.error = formModel.error
         }
     }
