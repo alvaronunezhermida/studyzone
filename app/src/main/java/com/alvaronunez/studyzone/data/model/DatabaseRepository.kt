@@ -37,7 +37,7 @@ class DatabaseRepository {
     suspend fun getCategoriesByUser(userId: String?): List<CategoryDTO>? =
         try {
             val userRef = db.document("users/$userId")
-            val documents = db.collection("categories").get().await()
+            val documents = db.collection("categories").whereIn("userId", mutableListOf(userRef, "all")).get().await()
             documents.toObjects(CategoryDTO::class.java)
         }catch (e: Exception) {
             null
