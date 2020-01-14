@@ -9,7 +9,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context=".presentation.createitem.CreateItemActivity">
+    tools:context=".presentation.ui.createitem.CreateItemActivity">
 
     <EditText
         android:id="@+id/itemTitle"
@@ -72,7 +72,7 @@
     </RelativeLayout>
 
     <Button
-        android:id="@+id/add_category_button"
+        android:id="@+id/add_item_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
