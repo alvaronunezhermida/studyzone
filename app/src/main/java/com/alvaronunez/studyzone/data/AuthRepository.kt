@@ -1,6 +1,7 @@
 package com.alvaronunez.studyzone.data
 
 import com.google.firebase.auth.*
+import kotlinx.coroutines.tasks.await
 import java.lang.Exception
 
 class AuthRepository {
@@ -15,52 +16,33 @@ class AuthRepository {
 
     fun thereIsUserSigned() = mAuth.currentUser != null
 
-    fun signInWithEmailAndPassword(email: String, password: String, callback: (Result<AuthResult?>) -> Unit) {
-        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-            if (task.isSuccessful) callback(Result.success(task.result))
-            else {
-                when (task.exception) {
-                    is FirebaseAuthInvalidUserException -> callback(Result.failure(task.exception?: Exception())) //TODO: Espicificar error para usuario inválido
-                    is FirebaseAuthInvalidCredentialsException -> callback(Result.failure(task.exception?: Exception())) //TODO: Especificar error para credenciales inválidas
-                    else -> callback(Result.failure(task.exception?: Exception()))
-                }
-            }
+    suspend fun signInWithEmailAndPassword(email: String, password: String): AuthResult? =
+        try {
+            mAuth.signInWithEmailAndPassword(email, password).await()
+        }catch (e: Exception){
+            null
         }
-    }
 
-    fun signInWithCredential(token: String?, callback: (Result<AuthResult?>) -> Unit) {
+    suspend fun signInWithCredential(token: String?): AuthResult? =
         try {
             val credential = GoogleAuthProvider.getCredential(token, null)
-            mAuth.signInWithCredential(credential).addOnCompleteListener { task ->
-                if (task.isSuccessful) callback(Result.success(task.result))
-                else callback(Result.failure(task.exception ?: Exception()))
-            }
+            mAuth.signInWithCredential(credential).await()
         }catch (e: Exception) {
-            callback(Result.failure(e))
+            null
         }
 
-    }
 
-    fun signUpNewUser(email: String, password: String, displayName: String, callback: (Result<AuthResult>) -> Unit) {
-        mAuth.createUserWithEmailAndPassword(email, password).addOnSuccessListener { result ->
-            try {
-                val user = UserProfileChangeRequest.Builder()
-                    .setDisplayName(displayName)
-                    .build()
-                mAuth.currentUser?.updateProfile(user)?.addOnSuccessListener {
-                    callback(Result.success(result))
-                }?.addOnFailureListener { e ->
-                    callback(Result.failure(e))
-                }
-            }catch (e: Exception) {
-                callback(Result.failure(e))
-            }
-        }.addOnFailureListener { e ->
-            //if (e.message == "The email address is badly formatted.") callback(Result.failure(e))//TODO: Especificar error formato email incorrecto
-            callback(Result.failure(e))
+    suspend fun signUpNewUser(email: String, password: String, displayName: String): AuthResult? =
+        try {
+            val result = mAuth.createUserWithEmailAndPassword(email, password).await()
+            val user = UserProfileChangeRequest.Builder()
+                .setDisplayName(displayName)
+                .build()
+            mAuth.currentUser?.updateProfile(user)
+            result
+        }catch (e: Exception) {
+            null
         }
-
-    }
 
     fun removeCurrentUser() {
         mAuth.currentUser?.delete()

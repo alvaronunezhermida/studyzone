@@ -6,13 +6,13 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.alvaronunez.studyzone.presentation.main.MainViewModel" />
+            type="com.alvaronunez.studyzone.presentation.ui.main.MainViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.main.MainActivity">
+        tools:context=".presentation.ui.main.MainActivity">
 
         <ImageView
             android:layout_width="match_parent"

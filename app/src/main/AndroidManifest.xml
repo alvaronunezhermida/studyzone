@@ -10,14 +10,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".presentation.signup.SignUpActivity"
+        <activity android:name="com.alvaronunez.studyzone.presentation.ui.signup.SignUpActivity"
             android:theme="@style/AppThemeNoActionBar"/>
-        <activity android:name=".presentation.login.LoginActivity"
+        <activity android:name="com.alvaronunez.studyzone.presentation.ui.login.LoginActivity"
             android:theme="@style/AppThemeNoActionBar" />
-        <activity android:name=".presentation.main.MainActivity" />
-        <activity android:name=".presentation.createitem.CreateItemActivity" />
+        <activity android:name="com.alvaronunez.studyzone.presentation.ui.main.MainActivity" />
+        <activity android:name="com.alvaronunez.studyzone.presentation.ui.createitem.CreateItemActivity" />
         <activity
-            android:name=".presentation.SplashActivity"
+            android:name=".presentation.ui.SplashActivity"
             android:theme="@style/AppThemeNoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
