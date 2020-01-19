@@ -8,13 +8,17 @@ import android.view.animation.AnimationUtils
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import com.alvaronunez.studyzone.R
+import com.alvaronunez.studyzone.data.repository.AuthenticationRepository
 import com.alvaronunez.studyzone.data.repository.Repository
 import com.alvaronunez.studyzone.databinding.ActivityMainBinding
+import com.alvaronunez.studyzone.presentation.data.FirebaseAuthDataSource
 import com.alvaronunez.studyzone.presentation.data.FirebaseDataSource
 import com.alvaronunez.studyzone.presentation.ui.common.EventObserver
 import com.alvaronunez.studyzone.presentation.ui.common.getViewModel
 import com.alvaronunez.studyzone.presentation.ui.createitem.CreateItemActivity
 import com.alvaronunez.studyzone.usecases.GetItemsByUser
+import com.alvaronunez.studyzone.usecases.GetSignedUser
+import com.alvaronunez.studyzone.usecases.SignOutSignedUser
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.startActivity
 
@@ -25,7 +29,9 @@ class MainActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = getViewModel { MainViewModel(GetItemsByUser(Repository(FirebaseDataSource())))}
+        viewModel = getViewModel { MainViewModel(GetItemsByUser(Repository(FirebaseDataSource())),
+                                                GetSignedUser(AuthenticationRepository(FirebaseAuthDataSource())),
+                                                SignOutSignedUser(AuthenticationRepository(FirebaseAuthDataSource())))}
 
         val binding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.viewmodel = viewModel

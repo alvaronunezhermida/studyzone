@@ -2,15 +2,16 @@ package com.alvaronunez.studyzone.presentation.ui.createitem
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.alvaronunez.studyzone.data.AuthRepository
 import com.alvaronunez.studyzone.domain.Category
 import com.alvaronunez.studyzone.domain.Item
 import com.alvaronunez.studyzone.presentation.ui.common.ScopedViewModel
 import com.alvaronunez.studyzone.usecases.AddItem
 import com.alvaronunez.studyzone.usecases.GetCategoriesByUser
+import com.alvaronunez.studyzone.usecases.GetSignedUser
 import kotlinx.coroutines.launch
 
 class CreateItemViewModel(private val getCategoriesByUser: GetCategoriesByUser,
+                          private val getSignedUser: GetSignedUser,
                           private val addItem: AddItem) : ScopedViewModel() {
 
     private val _model = MutableLiveData<UiModel>()
@@ -19,8 +20,6 @@ class CreateItemViewModel(private val getCategoriesByUser: GetCategoriesByUser,
             if (_model.value == null) refresh()
             return _model
         }
-
-    private val authRepository : AuthRepository by lazy { AuthRepository() }
 
     sealed class UiModel {
         class Categories(val categories: List<Category>) : UiModel()
@@ -36,8 +35,8 @@ class CreateItemViewModel(private val getCategoriesByUser: GetCategoriesByUser,
     private fun refresh(){
         _model.value = UiModel.Loading
         launch{
-            authRepository.getCurrentUser()?.uid?.let {
-                _model.value = UiModel.Categories(getCategoriesByUser.invoke(it)) //TODO: crear opción añadir categoría cuando la lista viene vacía
+            getSignedUser.invoke()?.let {
+                _model.value = UiModel.Categories(getCategoriesByUser.invoke(it.id)) //TODO: crear opción añadir categoría cuando la lista viene vacía
             }
         }
     }
@@ -53,8 +52,8 @@ class CreateItemViewModel(private val getCategoriesByUser: GetCategoriesByUser,
 
     fun addItem(itemTitle: String, itemDescription: String) {
         launch {
-            authRepository.getCurrentUser()?.uid?.let { userId ->
-                _model.value = addItem.invoke(Item(title = itemTitle, description = itemDescription, userId = userId)).let {
+            getSignedUser.invoke()?.let {user ->
+                _model.value = addItem.invoke(Item(title = itemTitle, description = itemDescription, userId = user.id)).let {
                     if(it) UiModel.Finish
                     else UiModel.Message("Can't create")
                 }

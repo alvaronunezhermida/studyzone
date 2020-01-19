@@ -5,14 +5,16 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import com.alvaronunez.studyzone.R
+import com.alvaronunez.studyzone.data.repository.AuthenticationRepository
 import com.alvaronunez.studyzone.data.repository.Repository
+import com.alvaronunez.studyzone.presentation.data.FirebaseAuthDataSource
 import com.alvaronunez.studyzone.presentation.data.FirebaseDataSource
 import com.alvaronunez.studyzone.presentation.ui.common.getViewModel
 import com.alvaronunez.studyzone.presentation.ui.createitem.CreateItemViewModel.UiModel
 import com.alvaronunez.studyzone.usecases.AddItem
 import com.alvaronunez.studyzone.usecases.GetCategoriesByUser
+import com.alvaronunez.studyzone.usecases.GetSignedUser
 import kotlinx.android.synthetic.main.activity_create_item.*
 
 class CreateItemActivity : AppCompatActivity() {
@@ -25,7 +27,9 @@ class CreateItemActivity : AppCompatActivity() {
         setContentView(R.layout.activity_create_item)
         setListeners()
 
-        viewModel = getViewModel { CreateItemViewModel(GetCategoriesByUser(Repository(FirebaseDataSource())), AddItem(Repository(FirebaseDataSource()))) }
+        viewModel = getViewModel { CreateItemViewModel(GetCategoriesByUser(Repository(FirebaseDataSource())),
+                                    GetSignedUser(AuthenticationRepository(FirebaseAuthDataSource())),
+                                    AddItem(Repository(FirebaseDataSource()))) }
 
         adapter = CategoriesAdapter(viewModel::onCategoryClicked)
         itemCategoryList.adapter = adapter

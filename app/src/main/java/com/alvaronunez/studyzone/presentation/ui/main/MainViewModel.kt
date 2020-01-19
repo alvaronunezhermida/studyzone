@@ -2,14 +2,17 @@ package com.alvaronunez.studyzone.presentation.ui.main
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.alvaronunez.studyzone.data.AuthRepository
 import com.alvaronunez.studyzone.domain.Item
 import com.alvaronunez.studyzone.presentation.ui.common.Event
 import com.alvaronunez.studyzone.presentation.ui.common.ScopedViewModel
 import com.alvaronunez.studyzone.usecases.GetItemsByUser
+import com.alvaronunez.studyzone.usecases.GetSignedUser
+import com.alvaronunez.studyzone.usecases.SignOutSignedUser
 import kotlinx.coroutines.launch
 
-class MainViewModel(private val getItemsByUser: GetItemsByUser) : ScopedViewModel() {
+class MainViewModel(private val getItemsByUser: GetItemsByUser,
+                    private val getSignedUser: GetSignedUser,
+                    private val signOutSignedUser: SignOutSignedUser) : ScopedViewModel() {
 
     private val _items = MutableLiveData<List<Item>>()
     val items: LiveData<List<Item>> get() = _items
@@ -33,14 +36,6 @@ class MainViewModel(private val getItemsByUser: GetItemsByUser) : ScopedViewMode
             return _openFabs
         }
 
-
-    private val authRepository : AuthRepository by lazy { AuthRepository() }
-
-    sealed class FabsModel {
-        object Opened : FabsModel()
-        object Closed : FabsModel()
-    }
-
     init {
         initScope()
         refresh()
@@ -49,8 +44,8 @@ class MainViewModel(private val getItemsByUser: GetItemsByUser) : ScopedViewMode
     private fun refresh() {
         launch {
             _loading.value = true
-            authRepository.getCurrentUser()?.uid?.let { userId ->
-                _items.value = getItemsByUser.invoke(userId)
+            getSignedUser.invoke()?.let {user ->
+                _items.value = getItemsByUser.invoke(user.id)
             }
             _loading.value = false
         }
@@ -61,9 +56,11 @@ class MainViewModel(private val getItemsByUser: GetItemsByUser) : ScopedViewMode
     }
 
     fun onSignOutClicked() {
-        authRepository.signOut()
-        _message.value = "Sesión cerrada"
-        _finish.value = Event(Unit)
+        launch {
+            signOutSignedUser.invoke()
+            _message.value = "Sesión cerrada"
+            _finish.value = Event(Unit)
+        }
     }
 
     override fun onCleared() {

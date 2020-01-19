@@ -3,8 +3,8 @@ package com.alvaronunez.studyzone.usecases
 import com.alvaronunez.studyzone.data.repository.Repository
 import com.alvaronunez.studyzone.domain.Item
 
-class AddItem(private val respository: Repository) {
+class AddItem(private val repository: Repository) {
 
-    suspend fun invoke(item: Item): Boolean = respository.addItem(item)
+    suspend fun invoke(item: Item): Boolean = repository.addItem(item)
 
 }

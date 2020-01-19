@@ -2,13 +2,16 @@ package com.alvaronunez.studyzone.presentation.ui.signup
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.alvaronunez.studyzone.data.AuthRepository
 import com.alvaronunez.studyzone.domain.User
 import com.alvaronunez.studyzone.presentation.ui.common.*
+import com.alvaronunez.studyzone.usecases.RemoveSignedUser
 import com.alvaronunez.studyzone.usecases.SaveUser
+import com.alvaronunez.studyzone.usecases.SignUpNewUser
 import kotlinx.coroutines.launch
 
-class SignUpViewModel(private val saveUser: SaveUser) : ScopedViewModel() {
+class SignUpViewModel(private val saveUser: SaveUser,
+                      private val signUpNewUser: SignUpNewUser,
+                      private val removeSignedUser: RemoveSignedUser) : ScopedViewModel() {
 
     private val _model = MutableLiveData<UiModel>()
     val model: LiveData<UiModel>
@@ -17,8 +20,6 @@ class SignUpViewModel(private val saveUser: SaveUser) : ScopedViewModel() {
     private val _formModel = MutableLiveData<FormModel>()
     val formModel: LiveData<FormModel>
         get() = _formModel
-
-    private val authRepository : AuthRepository by lazy { AuthRepository() }
 
     sealed class UiModel {
         object Loading : UiModel()
@@ -68,20 +69,16 @@ class SignUpViewModel(private val saveUser: SaveUser) : ScopedViewModel() {
     fun onSignUpClicked(userUIForm: UserUIForm, lastName: String) {
         _model.value = UiModel.Loading
         launch {
-            authRepository.signUpNewUser(userUIForm.email, userUIForm.password, "${userUIForm.name} $lastName")?.let {result ->
-                result.user?.let { currentUser ->
-                    if(saveUser.invoke(User(
-                            id = currentUser.uid,
-                            name = userUIForm.name,
-                            lastName = lastName,
-                            email = userUIForm.email
-                        ))){
-                        _model.value = UiModel.Message("${currentUser.displayName} registrado!")
-                        _model.value = UiModel.NavigateToMain
-                    }else{
-                        saveUserFailed()
-                    }
-                }?: run {
+            signUpNewUser.invoke(userUIForm.email, userUIForm.password, "${userUIForm.name} $lastName")?.let {user ->
+                if(saveUser.invoke(User(
+                        id = user.id,
+                        name = userUIForm.name,
+                        lastName = lastName,
+                        email = userUIForm.email
+                    ))){
+                    _model.value = UiModel.Message("${user.displayName} registrado!")
+                    _model.value = UiModel.NavigateToMain
+                }else{
                     saveUserFailed()
                 }
             }?: run {
@@ -91,8 +88,10 @@ class SignUpViewModel(private val saveUser: SaveUser) : ScopedViewModel() {
     }
 
     private fun saveUserFailed() {
-        authRepository.removeCurrentUser()
-        _model.value = UiModel.Message("Authentication failed.")
+        launch {
+            removeSignedUser.invoke()
+            _model.value = UiModel.Message("Authentication failed.")
+        }
     }
 
     override fun onCleared() {

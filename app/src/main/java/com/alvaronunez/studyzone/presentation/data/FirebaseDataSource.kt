@@ -9,7 +9,7 @@ import com.alvaronunez.studyzone.domain.User
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
-class FirebaseDataSource(): RemoteDataSource {
+class FirebaseDataSource: RemoteDataSource {
 
     private val db = FirebaseFirestore.getInstance()
 

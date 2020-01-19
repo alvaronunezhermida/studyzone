@@ -17,7 +17,7 @@
         <activity android:name="com.alvaronunez.studyzone.presentation.ui.main.MainActivity" />
         <activity android:name="com.alvaronunez.studyzone.presentation.ui.createitem.CreateItemActivity" />
         <activity
-            android:name=".presentation.ui.SplashActivity"
+            android:name=".presentation.ui.splash.SplashActivity"
             android:theme="@style/AppThemeNoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
