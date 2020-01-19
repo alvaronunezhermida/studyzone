@@ -6,12 +6,16 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import com.alvaronunez.studyzone.presentation.ui.login.LoginViewModel.UiModel
 import com.alvaronunez.studyzone.presentation.ui.login.LoginViewModel.FormModel
 import com.alvaronunez.studyzone.R
+import com.alvaronunez.studyzone.data.repository.AuthenticationRepository
+import com.alvaronunez.studyzone.presentation.data.FirebaseAuthDataSource
+import com.alvaronunez.studyzone.presentation.ui.common.getViewModel
 import com.alvaronunez.studyzone.presentation.ui.main.MainActivity
 import com.alvaronunez.studyzone.presentation.ui.signup.SignUpActivity
+import com.alvaronunez.studyzone.usecases.SignInWithEmailAndPassword
+import com.alvaronunez.studyzone.usecases.SignInWithGoogleCredential
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import kotlinx.android.synthetic.main.activity_login.*
@@ -58,9 +62,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun viewModelSetUp() {
-        viewModel = ViewModelProviders.of(
-            this,
-            LoginViewModelFactory())[LoginViewModel::class.java]
+        viewModel = getViewModel { LoginViewModel(SignInWithGoogleCredential(AuthenticationRepository(FirebaseAuthDataSource())),
+            SignInWithEmailAndPassword(AuthenticationRepository(FirebaseAuthDataSource()))) }
 
         viewModel.model.observe(this, Observer(::updateUi))
         viewModel.formModel.observe(this, Observer(::updateFormError))

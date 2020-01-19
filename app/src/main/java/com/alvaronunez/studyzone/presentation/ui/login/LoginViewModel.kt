@@ -3,15 +3,15 @@ package com.alvaronunez.studyzone.presentation.ui.login
 import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.alvaronunez.studyzone.data.AuthRepository
-import com.alvaronunez.studyzone.presentation.ui.common.Scope
+import com.alvaronunez.studyzone.presentation.ui.common.ScopedViewModel
 import com.alvaronunez.studyzone.presentation.ui.common.isValidEmail
 import com.alvaronunez.studyzone.presentation.ui.common.isValidPassword
+import com.alvaronunez.studyzone.usecases.SignInWithEmailAndPassword
+import com.alvaronunez.studyzone.usecases.SignInWithGoogleCredential
 import kotlinx.coroutines.launch
 
-class LoginViewModel : ViewModel(), Scope by Scope.Impl() {
+class LoginViewModel(private val signInWithGoogleCredential: SignInWithGoogleCredential,
+                     private val signInWithEmailAndPassword: SignInWithEmailAndPassword) : ScopedViewModel() {
 
     private val _model = MutableLiveData<UiModel>()
     val model: LiveData<UiModel>
@@ -20,8 +20,6 @@ class LoginViewModel : ViewModel(), Scope by Scope.Impl() {
     private val _formModel = MutableLiveData<FormModel>()
     val formModel: LiveData<FormModel>
         get() = _formModel
-
-    private val authRepository : AuthRepository by lazy { AuthRepository() }
 
     sealed class UiModel {
         object Loading : UiModel()
@@ -49,9 +47,8 @@ class LoginViewModel : ViewModel(), Scope by Scope.Impl() {
     fun onLoginClicked(email: String, password: String) {
         _model.value = UiModel.Loading
         launch {
-            authRepository.signInWithEmailAndPassword(email, password)?.let {
-                authRepository.getCurrentUser()
-                _model.value = UiModel.Message("${it.user?.displayName} logueado!")
+            signInWithEmailAndPassword.invoke(email, password)?.let {user ->
+                _model.value = UiModel.Message("${user.displayName} logueado!")
                 _model.value = UiModel.NavigateToMain
             }?: run {
                 _model.value = UiModel.Message("Login fallido!")
@@ -77,11 +74,11 @@ class LoginViewModel : ViewModel(), Scope by Scope.Impl() {
     }
 
     fun fromGoogleSignInResult(token: String?) {
-        token?.let{ it ->
+        token?.let{
             _model.value = UiModel.Loading
             launch {
-                authRepository.signInWithCredential(it)?.let {
-                    _model.value = UiModel.Message("${it.user?.displayName} logueado con google!")
+                signInWithGoogleCredential.invoke(it)?.let {user ->
+                    _model.value = UiModel.Message("${user.displayName} logueado con google!")
                     _model.value = UiModel.NavigateToMain
                 }?: run {
                     _model.value = UiModel.Message("Error al logear con google!")
@@ -102,11 +99,4 @@ class LoginViewModel : ViewModel(), Scope by Scope.Impl() {
         super.onCleared()
     }
 
-}
-
-@Suppress("UNCHECKED_CAST")
-class LoginViewModelFactory :
-    ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-        LoginViewModel() as T
 }
