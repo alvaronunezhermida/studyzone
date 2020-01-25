@@ -6,30 +6,24 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.alvaronunez.studyzone.R
-import com.alvaronunez.studyzone.data.repository.AuthenticationRepository
-import com.alvaronunez.studyzone.data.repository.Repository
-import com.alvaronunez.studyzone.presentation.data.FirebaseAuthDataSource
-import com.alvaronunez.studyzone.presentation.data.FirebaseDataSource
+import com.alvaronunez.studyzone.presentation.ui.common.app
 import com.alvaronunez.studyzone.presentation.ui.common.getViewModel
 import com.alvaronunez.studyzone.presentation.ui.createitem.CreateItemViewModel.UiModel
-import com.alvaronunez.studyzone.usecases.AddItem
-import com.alvaronunez.studyzone.usecases.GetCategoriesByUser
-import com.alvaronunez.studyzone.usecases.GetSignedUser
 import kotlinx.android.synthetic.main.activity_create_item.*
 
 class CreateItemActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: CreateItemViewModel
+    private lateinit var component: CreateItemActivityComponent
+    private val viewModel: CreateItemViewModel by lazy { getViewModel { component.createItemViewModel } }
     private lateinit var adapter : CategoriesAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_item)
-        setListeners()
 
-        viewModel = getViewModel { CreateItemViewModel(GetCategoriesByUser(Repository(FirebaseDataSource())),
-                                    GetSignedUser(AuthenticationRepository(FirebaseAuthDataSource())),
-                                    AddItem(Repository(FirebaseDataSource()))) }
+        component = app.component.plus(CreateItemActivityModule())
+
+        setListeners()
 
         adapter = CategoriesAdapter(viewModel::onCategoryClicked)
         itemCategoryList.adapter = adapter

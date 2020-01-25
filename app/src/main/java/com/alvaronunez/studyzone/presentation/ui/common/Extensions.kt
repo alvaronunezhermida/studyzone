@@ -1,5 +1,6 @@
 package com.alvaronunez.studyzone.presentation.ui.common
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.alvaronunez.studyzone.StudyZoneApp
 import kotlin.properties.Delegates
 
 fun <T : ViewDataBinding> ViewGroup.bindingInflate(
@@ -51,3 +53,8 @@ inline fun <reified T : ViewModel> FragmentActivity.getViewModel(crossinline fac
 
     return ViewModelProviders.of(this, vmFactory)[T::class.java]
 }
+
+
+
+val Context.app: StudyZoneApp
+    get() = applicationContext as StudyZoneApp

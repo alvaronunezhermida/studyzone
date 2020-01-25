@@ -1,39 +1,34 @@
 package com.alvaronunez.studyzone.presentation.ui.main
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.animation.AnimationUtils
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import com.alvaronunez.studyzone.R
-import com.alvaronunez.studyzone.data.repository.AuthenticationRepository
-import com.alvaronunez.studyzone.data.repository.Repository
 import com.alvaronunez.studyzone.databinding.ActivityMainBinding
-import com.alvaronunez.studyzone.presentation.data.FirebaseAuthDataSource
-import com.alvaronunez.studyzone.presentation.data.FirebaseDataSource
 import com.alvaronunez.studyzone.presentation.ui.common.EventObserver
+import com.alvaronunez.studyzone.presentation.ui.common.app
 import com.alvaronunez.studyzone.presentation.ui.common.getViewModel
 import com.alvaronunez.studyzone.presentation.ui.createitem.CreateItemActivity
-import com.alvaronunez.studyzone.usecases.GetItemsByUser
-import com.alvaronunez.studyzone.usecases.GetSignedUser
-import com.alvaronunez.studyzone.usecases.SignOutSignedUser
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.startActivity
 
 class MainActivity : AppCompatActivity(){
 
-    private lateinit var viewModel: MainViewModel
+
+    private lateinit var component: MainActivityComponent
+    private val viewModel: MainViewModel by lazy { getViewModel { component.mainViewModel } }
     private lateinit var adapter : ItemsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = getViewModel { MainViewModel(GetItemsByUser(Repository(FirebaseDataSource())),
-                                                GetSignedUser(AuthenticationRepository(FirebaseAuthDataSource())),
-                                                SignOutSignedUser(AuthenticationRepository(FirebaseAuthDataSource())))}
-
         val binding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+
+        component = app.component.plus(MainActivityModule())
+
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
 

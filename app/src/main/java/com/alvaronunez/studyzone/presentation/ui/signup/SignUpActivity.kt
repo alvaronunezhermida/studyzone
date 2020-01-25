@@ -11,6 +11,7 @@ import com.alvaronunez.studyzone.data.repository.AuthenticationRepository
 import com.alvaronunez.studyzone.data.repository.Repository
 import com.alvaronunez.studyzone.presentation.data.FirebaseAuthDataSource
 import com.alvaronunez.studyzone.presentation.data.FirebaseDataSource
+import com.alvaronunez.studyzone.presentation.ui.common.app
 import com.alvaronunez.studyzone.presentation.ui.common.getViewModel
 import com.alvaronunez.studyzone.presentation.ui.signup.SignUpViewModel.UiModel
 import com.alvaronunez.studyzone.presentation.ui.signup.SignUpViewModel.FormModel
@@ -23,12 +24,17 @@ import org.jetbrains.anko.startActivity
 
 class SignUpActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: SignUpViewModel
+
+    private lateinit var component: SignUpActivityComponent
+    private val viewModel: SignUpViewModel by lazy { getViewModel { component.signUpViewModel } }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
+
+        component = app.component.plus(SignUpActivityModule())
+
         setListeners()
         viewModelSetUp()
     }
@@ -44,10 +50,6 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun viewModelSetUp() {
-        viewModel = getViewModel { SignUpViewModel(SaveUser(Repository(FirebaseDataSource())),
-                                    SignUpNewUser(AuthenticationRepository(FirebaseAuthDataSource())),
-                                    RemoveSignedUser(AuthenticationRepository(FirebaseAuthDataSource()))) }
-
         viewModel.model.observe(this, Observer(::updateUi))
         viewModel.formModel.observe(this, Observer(::updateFormError))
     }
