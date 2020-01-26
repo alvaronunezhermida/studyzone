@@ -5,25 +5,19 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import com.alvaronunez.studyzone.presentation.ui.main.MainActivity
 import com.alvaronunez.studyzone.R
-import com.alvaronunez.studyzone.data.repository.AuthenticationRepository
-import com.alvaronunez.studyzone.data.repository.Repository
-import com.alvaronunez.studyzone.presentation.data.FirebaseAuthDataSource
-import com.alvaronunez.studyzone.presentation.data.FirebaseDataSource
-import com.alvaronunez.studyzone.presentation.ui.common.getViewModel
-import com.alvaronunez.studyzone.presentation.ui.signup.SignUpViewModel.UiModel
+import com.alvaronunez.studyzone.presentation.ui.main.MainActivity
 import com.alvaronunez.studyzone.presentation.ui.signup.SignUpViewModel.FormModel
-import com.alvaronunez.studyzone.usecases.RemoveSignedUser
-import com.alvaronunez.studyzone.usecases.SaveUser
-import com.alvaronunez.studyzone.usecases.SignUpNewUser
+import com.alvaronunez.studyzone.presentation.ui.signup.SignUpViewModel.UiModel
 import kotlinx.android.synthetic.main.activity_sign_up.*
 import org.jetbrains.anko.startActivity
+import org.koin.android.scope.currentScope
+import org.koin.android.viewmodel.ext.android.viewModel
 
 
 class SignUpActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: SignUpViewModel
+    private val viewModel: SignUpViewModel by currentScope.viewModel(this)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,10 +38,6 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun viewModelSetUp() {
-        viewModel = getViewModel { SignUpViewModel(SaveUser(Repository(FirebaseDataSource())),
-                                    SignUpNewUser(AuthenticationRepository(FirebaseAuthDataSource())),
-                                    RemoveSignedUser(AuthenticationRepository(FirebaseAuthDataSource()))) }
-
         viewModel.model.observe(this, Observer(::updateUi))
         viewModel.formModel.observe(this, Observer(::updateFormError))
     }
