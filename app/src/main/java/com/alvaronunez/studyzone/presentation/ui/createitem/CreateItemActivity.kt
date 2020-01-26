@@ -6,23 +6,19 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.alvaronunez.studyzone.R
-import com.alvaronunez.studyzone.presentation.ui.common.app
-import com.alvaronunez.studyzone.presentation.ui.common.getViewModel
 import com.alvaronunez.studyzone.presentation.ui.createitem.CreateItemViewModel.UiModel
 import kotlinx.android.synthetic.main.activity_create_item.*
+import org.koin.android.scope.currentScope
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class CreateItemActivity : AppCompatActivity() {
 
-    private lateinit var component: CreateItemActivityComponent
-    private val viewModel: CreateItemViewModel by lazy { getViewModel { component.createItemViewModel } }
+    private val viewModel: CreateItemViewModel by currentScope.viewModel(this)
     private lateinit var adapter : CategoriesAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_item)
-
-        component = app.component.plus(CreateItemActivityModule())
-
         setListeners()
 
         adapter = CategoriesAdapter(viewModel::onCategoryClicked)

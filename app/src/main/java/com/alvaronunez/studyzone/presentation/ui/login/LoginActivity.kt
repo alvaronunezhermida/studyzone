@@ -6,17 +6,18 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import com.alvaronunez.studyzone.R
-import com.alvaronunez.studyzone.presentation.ui.common.app
-import com.alvaronunez.studyzone.presentation.ui.common.getViewModel
-import com.alvaronunez.studyzone.presentation.ui.login.LoginViewModel.FormModel
 import com.alvaronunez.studyzone.presentation.ui.login.LoginViewModel.UiModel
+import com.alvaronunez.studyzone.presentation.ui.login.LoginViewModel.FormModel
+import com.alvaronunez.studyzone.R
 import com.alvaronunez.studyzone.presentation.ui.main.MainActivity
 import com.alvaronunez.studyzone.presentation.ui.signup.SignUpActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.startActivity
+import org.koin.android.scope.currentScope
+import org.koin.android.viewmodel.ext.android.viewModel
+import java.lang.Exception
 
 
 class LoginActivity : AppCompatActivity() {
@@ -25,14 +26,11 @@ class LoginActivity : AppCompatActivity() {
         private const val RC_SIGN_IN = 9001
     }
 
-    private lateinit var component: LoginActivityComponent
-    private val viewModel by lazy { getViewModel { component.loginViewModel } }
+    private val viewModel: LoginViewModel by currentScope.viewModel(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-
-        component = app.component.plus(LoginActivityModule())
 
         setListeners()
         viewModelSetUp()

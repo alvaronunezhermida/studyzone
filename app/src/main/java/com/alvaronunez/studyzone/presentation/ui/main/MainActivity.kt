@@ -10,25 +10,21 @@ import androidx.lifecycle.Observer
 import com.alvaronunez.studyzone.R
 import com.alvaronunez.studyzone.databinding.ActivityMainBinding
 import com.alvaronunez.studyzone.presentation.ui.common.EventObserver
-import com.alvaronunez.studyzone.presentation.ui.common.app
-import com.alvaronunez.studyzone.presentation.ui.common.getViewModel
 import com.alvaronunez.studyzone.presentation.ui.createitem.CreateItemActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.startActivity
+import org.koin.android.scope.currentScope
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity(){
 
-
-    private lateinit var component: MainActivityComponent
-    private val viewModel: MainViewModel by lazy { getViewModel { component.mainViewModel } }
+    private val viewModel: MainViewModel by currentScope.viewModel(this)
     private lateinit var adapter : ItemsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val binding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-
-        component = app.component.plus(MainActivityModule())
-
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
 

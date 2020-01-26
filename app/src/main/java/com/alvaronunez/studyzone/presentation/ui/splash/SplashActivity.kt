@@ -4,24 +4,19 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.alvaronunez.studyzone.R
-import com.alvaronunez.studyzone.presentation.ui.common.app
-import com.alvaronunez.studyzone.presentation.ui.common.getViewModel
 import com.alvaronunez.studyzone.presentation.ui.login.LoginActivity
 import com.alvaronunez.studyzone.presentation.ui.main.MainActivity
 import org.jetbrains.anko.startActivity
+import org.koin.android.scope.currentScope
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class SplashActivity : AppCompatActivity() {
 
-
-    private lateinit var component: SplashActivityComponent
-    private val viewModel: SplashViewModel by lazy { getViewModel { component.splashViewModel } }
+    private val viewModel: SplashViewModel by currentScope.viewModel(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
-
-        component = app.component.plus(SplashActivityModule())
-
         viewModel.model.observe(this, Observer(::updateUi))
 
     }
