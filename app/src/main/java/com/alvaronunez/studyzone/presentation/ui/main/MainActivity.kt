@@ -11,6 +11,7 @@ import com.alvaronunez.studyzone.R
 import com.alvaronunez.studyzone.databinding.ActivityMainBinding
 import com.alvaronunez.studyzone.presentation.ui.common.EventObserver
 import com.alvaronunez.studyzone.presentation.ui.createitem.CreateItemActivity
+import com.alvaronunez.studyzone.presentation.ui.createphotoitem.CreatePhotoItemActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.startActivity
 import org.koin.android.scope.currentScope
@@ -41,6 +42,10 @@ class MainActivity : AppCompatActivity(){
 
         viewModel.navigateToCreateItem.observe(this, EventObserver{
             startActivity<CreateItemActivity>()
+        })
+
+        viewModel.navigateToCamera.observe(this, EventObserver{
+            startActivity<CreatePhotoItemActivity>()
         })
 
         viewModel.openFabs.observe(this, Observer { openFabs ->

@@ -82,7 +82,8 @@
             app:layout_constraintBottom_toTopOf="@+id/fab"
             app:layout_constraintEnd_toEndOf="@+id/fab"
             app:layout_constraintStart_toStartOf="@+id/fab"
-            app:pressedTranslationZ="12dp" />
+            app:pressedTranslationZ="12dp"
+            android:onClick="@{() -> viewmodel.onFabPhotoItemClicked()}"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
