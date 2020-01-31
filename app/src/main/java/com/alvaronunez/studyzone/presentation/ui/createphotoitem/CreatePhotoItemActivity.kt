@@ -2,19 +2,27 @@ package com.alvaronunez.studyzone.presentation.ui.createphotoitem
 
 import android.Manifest
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.databinding.DataBindingUtil
+import androidx.exifinterface.media.ExifInterface
 import com.alvaronunez.studyzone.R
+import com.alvaronunez.studyzone.databinding.ActivityCreatePhotoItemBinding
+import com.alvaronunez.studyzone.presentation.ui.common.EventObserver
 import com.alvaronunez.studyzone.presentation.ui.common.PermissionRequester
 import kotlinx.android.synthetic.main.activity_create_photo_item.*
+import org.koin.android.scope.currentScope
+import org.koin.android.viewmodel.ext.android.viewModel
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.min
+
 
 class CreatePhotoItemActivity : AppCompatActivity() {
 
@@ -22,18 +30,26 @@ class CreatePhotoItemActivity : AppCompatActivity() {
         private const val REQUEST_IMAGE_CAPTURE = 1
     }
 
+
+    private val viewModel: CreatePhotoItemViewModel by currentScope.viewModel(this)
     private val cameraPermissionRequester =
         PermissionRequester(this, Manifest.permission.CAMERA)
-
-    private val writePermissionRequester =
-        PermissionRequester(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
     private var currentPhotoPath: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_create_photo_item)
+        val binding: ActivityCreatePhotoItemBinding = DataBindingUtil.setContentView(this, R.layout.activity_create_photo_item)
+        binding.viewmodel = viewModel
+        binding.lifecycleOwner = this
+        setupObservers()
         openCamera()
+    }
+
+    private fun setupObservers() {
+        viewModel.takePhoto.observe(this, EventObserver{
+            openCamera()
+        })
     }
 
     private fun createImageFile(): File? {
@@ -55,7 +71,7 @@ class CreatePhotoItemActivity : AppCompatActivity() {
     }
 
     private fun openCamera() {
-        writePermissionRequester.request { writePermission ->
+        cameraPermissionRequester.request { cameraPermission ->
             Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
                 // Ensure that there's a camera activity to handle the intent
                 takePictureIntent.resolveActivity(packageManager)?.also {
@@ -70,20 +86,16 @@ class CreatePhotoItemActivity : AppCompatActivity() {
                         )
                         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
                         //TODO: Hacer con corrutinas
-                        cameraPermissionRequester.request { cameraPermission ->
-                            if (cameraPermission && writePermission) {
-                                Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-                                    takePictureIntent.resolveActivity(packageManager)?.also {
-                                        startActivityForResult(
-                                            takePictureIntent,
-                                            REQUEST_IMAGE_CAPTURE
-                                        )
-                                    }
-                                }
-                            } else {
-                                finish()
+                        if (cameraPermission) {
+                            takePictureIntent.resolveActivity(packageManager)?.also {
+                                startActivityForResult(
+                                    takePictureIntent,
+                                    REQUEST_IMAGE_CAPTURE
+                                )
                             }
 
+                        } else {
+                            finish()
                         }
                     }
                 }
@@ -92,29 +104,36 @@ class CreatePhotoItemActivity : AppCompatActivity() {
 
     }
 
+    private fun rotateImage(bitmap: Bitmap) =
+        currentPhotoPath?.let {
+            var rotate = 0
+            val exif = ExifInterface(it)
+            val orientation = exif.getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_NORMAL
+            )
+            when (orientation) {
+                ExifInterface.ORIENTATION_ROTATE_270 -> rotate = 270
+                ExifInterface.ORIENTATION_ROTATE_180 -> rotate = 180
+                ExifInterface.ORIENTATION_ROTATE_90 -> rotate = 90
+            }
+            val matrix = Matrix()
+            matrix.postRotate(rotate.toFloat())
+            Bitmap.createBitmap(
+                bitmap, 0, 0, bitmap.width,
+                bitmap.height, matrix, true
+            )
+        }?: run {
+            bitmap
+        }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK && data != null) {
-            data.extras?.let {
-                // Get the dimensions of the View
-                val targetW: Int = photoItemImage.width
-                val targetH: Int = photoItemImage.height
-
-                val bmOptions = BitmapFactory.Options().apply {
-                    val photoW: Int = outWidth
-                    val photoH: Int = outHeight
-
-                    // Determine how much to scale down the image
-                    val scaleFactor: Int = min(photoW / targetW, photoH / targetH)
-
-                    // Decode the image file into a Bitmap sized to fill the View
-                    inJustDecodeBounds = false
-                    inSampleSize = scaleFactor
-                }
-                BitmapFactory.decodeFile(currentPhotoPath, bmOptions)?.also {bitmap ->
-                    photoItemImage.setImageBitmap(bitmap)
-                }
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            BitmapFactory.decodeFile(currentPhotoPath)?.also {bitmap ->
+                photoItemImage.setImageBitmap(rotateImage(bitmap))
             }
+
         }
     }
 
