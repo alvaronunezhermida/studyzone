@@ -7,11 +7,13 @@ import com.alvaronunez.studyzone.presentation.ui.common.*
 import com.alvaronunez.studyzone.usecases.RemoveSignedUser
 import com.alvaronunez.studyzone.usecases.SaveUser
 import com.alvaronunez.studyzone.usecases.SignUpNewUser
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 
 class SignUpViewModel(private val saveUser: SaveUser,
                       private val signUpNewUser: SignUpNewUser,
-                      private val removeSignedUser: RemoveSignedUser) : ScopedViewModel() {
+                      private val removeSignedUser: RemoveSignedUser,
+                      uiDispatcher: CoroutineDispatcher) : ScopedViewModel(uiDispatcher) {
 
     private val _model = MutableLiveData<UiModel>()
     val model: LiveData<UiModel>
