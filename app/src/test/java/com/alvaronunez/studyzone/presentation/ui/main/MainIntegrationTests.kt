@@ -1,9 +1,9 @@
-package com.alvaronunez.studyzone.ui.main
+package com.alvaronunez.studyzone.presentation.ui.main
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.alvaronunez.studyzone.initMockedDi
-import com.alvaronunez.studyzone.presentation.ui.main.MainViewModel
+import com.alvaronunez.studyzone.presentation.ui.common.Event
+import com.alvaronunez.studyzone.presentation.ui.initMockedDi
 import com.alvaronunez.studyzone.usecases.GetItemsByUser
 import com.alvaronunez.studyzone.usecases.GetSignedUser
 import com.alvaronunez.studyzone.usecases.SignOutSignedUser
@@ -26,6 +26,9 @@ class MainIntegrationTests : AutoCloseKoinTest() {
 
     @Mock
     lateinit var openFabs: Observer<Boolean>
+
+    @Mock
+    lateinit var navigateToCreateItem: Observer<Event<Unit>>
 
     private lateinit var vm: MainViewModel
 
