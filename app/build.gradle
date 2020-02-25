@@ -51,6 +51,7 @@ dependencies {
     implementation 'android.arch.core:core-testing:1.1.1'
     implementation "androidx.exifinterface:exifinterface:1.1.0"
     implementation 'com.karumi:dexter:5.0.0'
+    testImplementation 'org.koin:koin-test:2.0.1'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
