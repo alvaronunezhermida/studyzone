@@ -1,4 +1,4 @@
-package com.alvaronunez.studyzone
+package com.alvaronunez.studyzone.presentation.ui
 
 import com.alvaronunez.studyzone.data.source.AuthenticationDataSource
 import com.alvaronunez.studyzone.data.source.RemoteDataSource
@@ -62,9 +62,11 @@ private val mockedUser = User(
 
 class FakeRemoteDataSource : RemoteDataSource {
 
-    override suspend fun getItemsByUser(userId: String): List<Item> = defaultFakeItems
+    override suspend fun getItemsByUser(userId: String): List<Item> =
+        defaultFakeItems
 
-    override suspend fun getCategoriesByUser(userId: String): List<Category> = defaultFakeCategories
+    override suspend fun getCategoriesByUser(userId: String): List<Category> =
+        defaultFakeCategories
 
     override suspend fun addItem(item: Item): Boolean = true
 
@@ -73,13 +75,16 @@ class FakeRemoteDataSource : RemoteDataSource {
 }
 
 class FakeFirebaseAuthDataSource : AuthenticationDataSource {
-    override fun getSignedUser(): User? = mockedUser
+    override fun getSignedUser(): User? =
+        mockedUser
 
     override fun signOut() = Unit
 
-    override suspend fun signInWithEmailAndPassword(email: String, password: String): User? = mockedUser
+    override suspend fun signInWithEmailAndPassword(email: String, password: String): User? =
+        mockedUser
 
-    override suspend fun signInWithGoogleCredential(token: String): User? = mockedUser
+    override suspend fun signInWithGoogleCredential(token: String): User? =
+        mockedUser
 
     override suspend fun signUpNewUser(
         email: String,
