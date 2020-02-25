@@ -5,9 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.alvaronunez.studyzone.presentation.ui.common.*
 import com.alvaronunez.studyzone.usecases.GetSignedUser
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 
-class SplashViewModel(private val getSignedUser: GetSignedUser) : ScopedViewModel() {
+class SplashViewModel(private val getSignedUser: GetSignedUser,
+                      uiDispatcher: CoroutineDispatcher,
+                      private val handler: Handler) : ScopedViewModel(uiDispatcher) {
 
     private val _model = MutableLiveData<UiModel>()
     val model: LiveData<UiModel>
@@ -24,7 +27,7 @@ class SplashViewModel(private val getSignedUser: GetSignedUser) : ScopedViewMode
     }
 
     private fun waitSplash() {
-        Handler().postDelayed({
+        handler.postDelayed({
             launch {
                 getSignedUser.invoke()?.let {
                     _model.value = UiModel.NavigateToMain

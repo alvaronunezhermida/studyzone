@@ -1,6 +1,7 @@
 package com.alvaronunez.studyzone.presentation
 
 import android.app.Application
+import android.os.Handler
 import com.alvaronunez.studyzone.data.repository.AuthenticationRepository
 import com.alvaronunez.studyzone.data.repository.Repository
 import com.alvaronunez.studyzone.data.source.AuthenticationDataSource
@@ -20,6 +21,8 @@ import com.alvaronunez.studyzone.presentation.ui.signup.SignUpViewModel
 import com.alvaronunez.studyzone.presentation.ui.splash.SplashActivity
 import com.alvaronunez.studyzone.presentation.ui.splash.SplashViewModel
 import com.alvaronunez.studyzone.usecases.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.android.viewmodel.dsl.viewModel
@@ -38,6 +41,8 @@ fun Application.initDI() {
 private val appModule = module {
     factory<RemoteDataSource>{ FirebaseDataSource()}
     factory<AuthenticationDataSource>{ FirebaseAuthDataSource() }
+    single<CoroutineDispatcher> { Dispatchers.Main }
+    single { Handler() }
 }
 
 private val dataModule = module {
@@ -47,38 +52,38 @@ private val dataModule = module {
 
 private val scopesModule = module {
     scope(named<CreateItemActivity>()) {
-        viewModel { CreateItemViewModel(get(), get(), get()) }
+        viewModel { CreateItemViewModel(get(), get(), get(), get()) }
         scoped { GetCategoriesByUser(get())}
         scoped { GetSignedUser(get()) }
         scoped { AddItem(get()) }
     }
 
     scope(named<LoginActivity>()) {
-        viewModel { LoginViewModel(get(), get()) }
+        viewModel { LoginViewModel(get(), get(), get()) }
         scoped { SignInWithEmailAndPassword(get())}
         scoped { SignInWithGoogleCredential(get()) }
     }
 
     scope(named<MainActivity>()) {
-        viewModel { MainViewModel(get(), get(), get()) }
+        viewModel { MainViewModel(get(), get(), get(), get()) }
         scoped { GetItemsByUser(get())}
         scoped { GetSignedUser(get()) }
         scoped { SignOutSignedUser(get()) }
     }
 
     scope(named<SignUpActivity>()) {
-        viewModel { SignUpViewModel(get(), get(), get()) }
+        viewModel { SignUpViewModel(get(), get(), get(), get()) }
         scoped { SaveUser(get())}
         scoped { SignUpNewUser(get()) }
         scoped { RemoveSignedUser(get()) }
     }
 
     scope(named<SplashActivity>()) {
-        viewModel { SplashViewModel(get()) }
+        viewModel { SplashViewModel(get(), get(), get()) }
         scoped { GetSignedUser(get())}
     }
 
     scope(named<CreatePhotoItemActivity>()) {
-        viewModel { CreatePhotoItemViewModel() }
+        viewModel { CreatePhotoItemViewModel(get()) }
     }
 }

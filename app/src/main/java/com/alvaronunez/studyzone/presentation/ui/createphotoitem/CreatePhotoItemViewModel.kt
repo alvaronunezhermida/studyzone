@@ -4,9 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.alvaronunez.studyzone.presentation.ui.common.Event
 import com.alvaronunez.studyzone.presentation.ui.common.ScopedViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 
 
-class CreatePhotoItemViewModel : ScopedViewModel() {
+class CreatePhotoItemViewModel(uiDispatcher: CoroutineDispatcher) : ScopedViewModel(uiDispatcher) {
 
     private val _takePhoto = MutableLiveData<Event<Unit>>()
     val takePhoto: LiveData<Event<Unit>> get() = _takePhoto

@@ -8,10 +8,12 @@ import com.alvaronunez.studyzone.presentation.ui.common.isValidEmail
 import com.alvaronunez.studyzone.presentation.ui.common.isValidPassword
 import com.alvaronunez.studyzone.usecases.SignInWithEmailAndPassword
 import com.alvaronunez.studyzone.usecases.SignInWithGoogleCredential
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 
 class LoginViewModel(private val signInWithGoogleCredential: SignInWithGoogleCredential,
-                     private val signInWithEmailAndPassword: SignInWithEmailAndPassword) : ScopedViewModel() {
+                     private val signInWithEmailAndPassword: SignInWithEmailAndPassword,
+                     uiDispatcher: CoroutineDispatcher) : ScopedViewModel(uiDispatcher) {
 
     private val _model = MutableLiveData<UiModel>()
     val model: LiveData<UiModel>

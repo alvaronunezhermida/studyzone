@@ -8,11 +8,13 @@ import com.alvaronunez.studyzone.presentation.ui.common.ScopedViewModel
 import com.alvaronunez.studyzone.usecases.AddItem
 import com.alvaronunez.studyzone.usecases.GetCategoriesByUser
 import com.alvaronunez.studyzone.usecases.GetSignedUser
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 
 class CreateItemViewModel(private val getCategoriesByUser: GetCategoriesByUser,
                           private val getSignedUser: GetSignedUser,
-                          private val addItem: AddItem) : ScopedViewModel() {
+                          private val addItem: AddItem,
+                          uiDispatcher: CoroutineDispatcher) : ScopedViewModel(uiDispatcher) {
 
     private val _model = MutableLiveData<UiModel>()
     val model: LiveData<UiModel>

@@ -8,11 +8,13 @@ import com.alvaronunez.studyzone.presentation.ui.common.ScopedViewModel
 import com.alvaronunez.studyzone.usecases.GetItemsByUser
 import com.alvaronunez.studyzone.usecases.GetSignedUser
 import com.alvaronunez.studyzone.usecases.SignOutSignedUser
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val getItemsByUser: GetItemsByUser,
                     private val getSignedUser: GetSignedUser,
-                    private val signOutSignedUser: SignOutSignedUser) : ScopedViewModel() {
+                    private val signOutSignedUser: SignOutSignedUser,
+                    uiDispatcher: CoroutineDispatcher) : ScopedViewModel(uiDispatcher) {
 
     private val _items = MutableLiveData<List<Item>>()
     val items: LiveData<List<Item>> get() = _items
