@@ -31,6 +31,9 @@ class MainViewModel(private val getItemsByUser: GetItemsByUser,
     private val _navigateToCreateItem = MutableLiveData<Event<Unit>>()
     val navigateToCreateItem: LiveData<Event<Unit>> get() = _navigateToCreateItem
 
+    private val _navigateToCamera = MutableLiveData<Event<Unit>>()
+    val navigateToCamera: LiveData<Event<Unit>> get() = _navigateToCamera
+
     private val _openFabs = MutableLiveData<Boolean>()
     val openFabs: LiveData<Boolean>
         get() {
@@ -77,5 +80,9 @@ class MainViewModel(private val getItemsByUser: GetItemsByUser,
 
     fun onFabItemClicked() {
         _navigateToCreateItem.value = Event(Unit)
+    }
+
+    fun onFabPhotoItemClicked() {
+        _navigateToCamera.value = Event(Unit)
     }
 }

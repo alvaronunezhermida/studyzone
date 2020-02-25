@@ -10,6 +10,8 @@ import com.alvaronunez.studyzone.presentation.data.FirebaseAuthDataSource
 import com.alvaronunez.studyzone.presentation.data.FirebaseDataSource
 import com.alvaronunez.studyzone.presentation.ui.createitem.CreateItemActivity
 import com.alvaronunez.studyzone.presentation.ui.createitem.CreateItemViewModel
+import com.alvaronunez.studyzone.presentation.ui.createphotoitem.CreatePhotoItemActivity
+import com.alvaronunez.studyzone.presentation.ui.createphotoitem.CreatePhotoItemViewModel
 import com.alvaronunez.studyzone.presentation.ui.login.LoginActivity
 import com.alvaronunez.studyzone.presentation.ui.login.LoginViewModel
 import com.alvaronunez.studyzone.presentation.ui.main.MainActivity
@@ -79,5 +81,9 @@ private val scopesModule = module {
     scope(named<SplashActivity>()) {
         viewModel { SplashViewModel(get(), get(), get()) }
         scoped { GetSignedUser(get())}
+    }
+
+    scope(named<CreatePhotoItemActivity>()) {
+        viewModel { CreatePhotoItemViewModel(get()) }
     }
 }
