@@ -5,9 +5,12 @@ import android.os.Handler
 import com.alvaronunez.studyzone.data.repository.AuthenticationRepository
 import com.alvaronunez.studyzone.data.repository.Repository
 import com.alvaronunez.studyzone.data.source.AuthenticationDataSource
+import com.alvaronunez.studyzone.data.source.LocalDataSource
 import com.alvaronunez.studyzone.data.source.RemoteDataSource
-import com.alvaronunez.studyzone.presentation.data.FirebaseAuthDataSource
-import com.alvaronunez.studyzone.presentation.data.FirebaseDataSource
+import com.alvaronunez.studyzone.presentation.data.database.ItemDatabase
+import com.alvaronunez.studyzone.presentation.data.database.RoomDataSource
+import com.alvaronunez.studyzone.presentation.data.server.FirebaseAuthDataSource
+import com.alvaronunez.studyzone.presentation.data.server.FirebaseDataSource
 import com.alvaronunez.studyzone.presentation.ui.createitem.CreateItemActivity
 import com.alvaronunez.studyzone.presentation.ui.createitem.CreateItemViewModel
 import com.alvaronunez.studyzone.presentation.ui.createphotoitem.CreatePhotoItemActivity
@@ -39,14 +42,16 @@ fun Application.initDI() {
 }
 
 private val appModule = module {
-    factory<RemoteDataSource>{ FirebaseDataSource()}
+    single { ItemDatabase.build(get()) }
+    factory<LocalDataSource> { RoomDataSource(get()) }
+    factory<RemoteDataSource>{ FirebaseDataSource() }
     factory<AuthenticationDataSource>{ FirebaseAuthDataSource() }
     single<CoroutineDispatcher> { Dispatchers.Main }
     single { Handler() }
 }
 
 val dataModule = module {
-    factory { Repository(get()) }
+    factory { Repository(get(), get()) }
     factory { AuthenticationRepository(get()) }
 }
 

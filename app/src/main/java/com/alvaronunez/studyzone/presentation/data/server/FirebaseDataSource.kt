@@ -1,4 +1,4 @@
-package com.alvaronunez.studyzone.presentation.data
+package com.alvaronunez.studyzone.presentation.data.server
 
 import com.alvaronunez.studyzone.data.CategoryDTO
 import com.alvaronunez.studyzone.data.ItemDTO
