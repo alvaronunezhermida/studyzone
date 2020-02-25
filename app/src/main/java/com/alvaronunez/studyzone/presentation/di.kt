@@ -45,7 +45,7 @@ private val appModule = module {
     single { Handler() }
 }
 
-private val dataModule = module {
+val dataModule = module {
     factory { Repository(get()) }
     factory { AuthenticationRepository(get()) }
 }
