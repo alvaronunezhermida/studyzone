@@ -8,17 +8,17 @@ import com.alvaronunez.studyzone.data.source.AuthenticationDataSource
 import com.alvaronunez.studyzone.data.source.RemoteDataSource
 import com.alvaronunez.studyzone.presentation.data.FirebaseAuthDataSource
 import com.alvaronunez.studyzone.presentation.data.FirebaseDataSource
-import com.alvaronunez.studyzone.presentation.ui.createitem.CreateItemActivity
+import com.alvaronunez.studyzone.presentation.ui.createitem.CreateItemFragment
 import com.alvaronunez.studyzone.presentation.ui.createitem.CreateItemViewModel
-import com.alvaronunez.studyzone.presentation.ui.createphotoitem.CreatePhotoItemActivity
+import com.alvaronunez.studyzone.presentation.ui.createphotoitem.CreatePhotoItemFragment
 import com.alvaronunez.studyzone.presentation.ui.createphotoitem.CreatePhotoItemViewModel
-import com.alvaronunez.studyzone.presentation.ui.login.LoginActivity
+import com.alvaronunez.studyzone.presentation.ui.login.LoginFragment
 import com.alvaronunez.studyzone.presentation.ui.login.LoginViewModel
-import com.alvaronunez.studyzone.presentation.ui.main.MainActivity
+import com.alvaronunez.studyzone.presentation.ui.main.MainFragment
 import com.alvaronunez.studyzone.presentation.ui.main.MainViewModel
-import com.alvaronunez.studyzone.presentation.ui.signup.SignUpActivity
+import com.alvaronunez.studyzone.presentation.ui.signup.SignUpFragment
 import com.alvaronunez.studyzone.presentation.ui.signup.SignUpViewModel
-import com.alvaronunez.studyzone.presentation.ui.splash.SplashActivity
+import com.alvaronunez.studyzone.presentation.ui.splash.SplashFragment
 import com.alvaronunez.studyzone.presentation.ui.splash.SplashViewModel
 import com.alvaronunez.studyzone.usecases.*
 import kotlinx.coroutines.CoroutineDispatcher
@@ -51,39 +51,39 @@ val dataModule = module {
 }
 
 private val scopesModule = module {
-    scope(named<CreateItemActivity>()) {
+    scope(named<CreateItemFragment>()) {
         viewModel { CreateItemViewModel(get(), get(), get(), get()) }
         scoped { GetCategoriesByUser(get())}
         scoped { GetSignedUser(get()) }
         scoped { AddItem(get()) }
     }
 
-    scope(named<LoginActivity>()) {
+    scope(named<LoginFragment>()) {
         viewModel { LoginViewModel(get(), get(), get()) }
         scoped { SignInWithEmailAndPassword(get())}
         scoped { SignInWithGoogleCredential(get()) }
     }
 
-    scope(named<MainActivity>()) {
+    scope(named<MainFragment>()) {
         viewModel { MainViewModel(get(), get(), get(), get()) }
         scoped { GetItemsByUser(get())}
         scoped { GetSignedUser(get()) }
         scoped { SignOutSignedUser(get()) }
     }
 
-    scope(named<SignUpActivity>()) {
+    scope(named<SignUpFragment>()) {
         viewModel { SignUpViewModel(get(), get(), get(), get()) }
         scoped { SaveUser(get())}
         scoped { SignUpNewUser(get()) }
         scoped { RemoveSignedUser(get()) }
     }
 
-    scope(named<SplashActivity>()) {
+    scope(named<SplashFragment>()) {
         viewModel { SplashViewModel(get(), get(), get()) }
         scoped { GetSignedUser(get())}
     }
 
-    scope(named<CreatePhotoItemActivity>()) {
+    scope(named<CreatePhotoItemFragment>()) {
         viewModel { CreatePhotoItemViewModel(get()) }
     }
 }

@@ -8,10 +8,9 @@
             type="com.alvaronunez.studyzone.presentation.ui.createphotoitem.CreatePhotoItemViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.ui.createitem.CreateItemActivity">
+        tools:context=".presentation.ui.createphotoitem.CreatePhotoItemFragment">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabTakePhoto"
@@ -23,7 +22,7 @@
             app:fabSize="mini"
             app:layout_constraintBottom_toBottomOf="@+id/photoItemImage"
             app:layout_constraintEnd_toEndOf="parent"
-            android:onClick="@{() -> viewmodel.onFabPhotoItemClicked()}" />
+            android:onClick="@{() -> viewmodel.onFabNewPhotoItemClicked()}" />
 
         <ImageView
             android:id="@+id/photoItemImage"

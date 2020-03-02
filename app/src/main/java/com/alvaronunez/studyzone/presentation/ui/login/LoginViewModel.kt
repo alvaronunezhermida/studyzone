@@ -91,9 +91,13 @@ class LoginViewModel(private val signInWithGoogleCredential: SignInWithGoogleCre
         }
     }
 
-    fun onGoogleLoginClicked(intent: Intent) {
-        _model.value = UiModel.Loading
-        _model.value = UiModel.LoginWithGoogle(intent)
+    fun onGoogleLoginClicked(intent: Intent?) {
+        intent?.let {
+            _model.value = UiModel.Loading
+            _model.value = UiModel.LoginWithGoogle(it)
+        }?: run{
+            _model.value = UiModel.Message("Google sign in failed")
+        }
     }
 
     override fun onCleared() {

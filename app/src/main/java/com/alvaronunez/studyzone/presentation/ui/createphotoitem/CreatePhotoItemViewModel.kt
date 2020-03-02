@@ -18,7 +18,7 @@ class CreatePhotoItemViewModel(uiDispatcher: CoroutineDispatcher) : ScopedViewMo
         initScope()
     }
 
-    fun onFabPhotoItemClicked() {
+    fun onFabNewPhotoItemClicked() {
         _takePhoto.value = Event(Unit)
     }
 

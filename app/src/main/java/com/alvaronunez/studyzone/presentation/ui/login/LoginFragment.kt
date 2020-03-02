@@ -2,48 +2,48 @@ package com.alvaronunez.studyzone.presentation.ui.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import com.alvaronunez.studyzone.presentation.ui.login.LoginViewModel.UiModel
-import com.alvaronunez.studyzone.presentation.ui.login.LoginViewModel.FormModel
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import com.alvaronunez.studyzone.R
-import com.alvaronunez.studyzone.presentation.ui.main.MainActivity
-import com.alvaronunez.studyzone.presentation.ui.signup.SignUpActivity
+import com.alvaronunez.studyzone.presentation.ui.login.LoginViewModel.FormModel
+import com.alvaronunez.studyzone.presentation.ui.login.LoginViewModel.UiModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import kotlinx.android.synthetic.main.activity_login.*
-import org.jetbrains.anko.startActivity
+import kotlinx.android.synthetic.main.fragment_login.*
 import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.ext.android.viewModel
-import java.lang.Exception
 
+class LoginFragment : Fragment() {
 
-class LoginActivity : AppCompatActivity() {
+    private val viewModel: LoginViewModel by currentScope.viewModel(this)
+    private lateinit var navController: NavController
 
     companion object {
         private const val RC_SIGN_IN = 9001
     }
 
-    private val viewModel: LoginViewModel by currentScope.viewModel(this)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_login, container, false)
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        navController = view.findNavController()
 
         setListeners()
         viewModelSetUp()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RC_SIGN_IN) {
-            viewModel.fromGoogleSignInResult(getSignedAccountTokenFromIntent(data))
-        }
-    }
-
-  
     private fun setListeners() {
         google_login.setOnClickListener {
             viewModel.onGoogleLoginClicked(getGoogleSignInIntent(getString(R.string.default_web_client_id)))
@@ -66,14 +66,21 @@ class LoginActivity : AppCompatActivity() {
     private fun updateUi(model: UiModel) {
         loading.visibility = if (model is UiModel.Loading) View.VISIBLE else View.GONE
         when (model) {
-            is UiModel.Message -> Toast.makeText(this, model.message, Toast.LENGTH_LONG).show()
+            is UiModel.Message -> Toast.makeText(this.context, model.message, Toast.LENGTH_LONG).show()
             is UiModel.NavigateToMain -> {
-                startActivity<MainActivity>()
-                finish()
+                navController.navigate(R.id.action_loginFragment_to_mainFragment)
             }
-            is UiModel.NavigateToSignUp -> startActivity<SignUpActivity>()
+            is UiModel.NavigateToSignUp -> navController.navigate(R.id.action_loginFragment_to_signUpFragment)
             is UiModel.LoginWithGoogle -> startActivityForResult(model.intent, RC_SIGN_IN)
             is UiModel.Content -> viewModel.onLoginClicked(model.email, model.password)
+        }
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == RC_SIGN_IN) {
+            viewModel.fromGoogleSignInResult(getSignedAccountTokenFromIntent(data))
         }
     }
 
@@ -85,14 +92,16 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun getGoogleSignInIntent(requestToken: String): Intent {
+    private fun getGoogleSignInIntent(requestToken: String): Intent? {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(requestToken)
             .requestEmail()
             .build()
-
-        val googleSignInClient = GoogleSignIn.getClient(this, gso)
-        return googleSignInClient.signInIntent
+        this.context?.let {
+            val googleSignInClient = GoogleSignIn.getClient(it, gso)
+            return googleSignInClient.signInIntent
+        }
+        return null
     }
 
     private fun updateFormError(formModel: FormModel) {
@@ -101,4 +110,5 @@ class LoginActivity : AppCompatActivity() {
             is FormModel.Password -> etPassword.error = formModel.error
         }
     }
+
 }
