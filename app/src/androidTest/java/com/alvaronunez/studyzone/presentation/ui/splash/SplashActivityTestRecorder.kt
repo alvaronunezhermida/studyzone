@@ -1,8 +1,6 @@
 package com.alvaronunez.studyzone.presentation.ui.splash
 
 
-import android.view.View
-import android.view.ViewGroup
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
