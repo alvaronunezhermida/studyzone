@@ -34,6 +34,12 @@ class MainViewModel(private val getItemsByUser: GetItemsByUser,
     private val _navigateToCamera = MutableLiveData<Event<Unit>>()
     val navigateToCamera: LiveData<Event<Unit>> get() = _navigateToCamera
 
+    private val _navigateToAudio = MutableLiveData<Event<Unit>>()
+    val navigateToAudio: LiveData<Event<Unit>> get() = _navigateToAudio
+
+    private val _navigateToFile = MutableLiveData<Event<Unit>>()
+    val navigateToFile: LiveData<Event<Unit>> get() = _navigateToFile
+
     private val _openFabs = MutableLiveData<Boolean>()
     val openFabs: LiveData<Boolean>
         get() {
@@ -54,6 +60,10 @@ class MainViewModel(private val getItemsByUser: GetItemsByUser,
             }
             _loading.value = false
         }
+    }
+
+    fun reloadItems() {
+        refresh()
     }
 
     fun onItemClicked(item: Item) {
@@ -84,5 +94,13 @@ class MainViewModel(private val getItemsByUser: GetItemsByUser,
 
     fun onFabPhotoItemClicked() {
         _navigateToCamera.value = Event(Unit)
+    }
+
+    fun onFabAudioItemClicked() {
+        _navigateToAudio.value = Event(Unit)
+    }
+
+    fun onFabFileItemClicked() {
+        _navigateToFile.value = Event(Unit)
     }
 }

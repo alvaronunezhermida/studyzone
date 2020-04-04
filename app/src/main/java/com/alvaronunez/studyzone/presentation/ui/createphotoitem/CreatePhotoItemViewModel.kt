@@ -12,6 +12,9 @@ class CreatePhotoItemViewModel(uiDispatcher: CoroutineDispatcher) : ScopedViewMo
     private val _takePhoto = MutableLiveData<Event<Unit>>()
     val takePhoto: LiveData<Event<Unit>> get() = _takePhoto
 
+    private val _addItem = MutableLiveData<Event<Unit>>()
+    val addItem: LiveData<Event<Unit>> get() = _addItem
+
 
 
     init {
@@ -20,6 +23,10 @@ class CreatePhotoItemViewModel(uiDispatcher: CoroutineDispatcher) : ScopedViewMo
 
     fun onFabPhotoItemClicked() {
         _takePhoto.value = Event(Unit)
+    }
+
+    fun onAddItemClicked() {
+        _addItem.value = Event(Unit)
     }
 
 

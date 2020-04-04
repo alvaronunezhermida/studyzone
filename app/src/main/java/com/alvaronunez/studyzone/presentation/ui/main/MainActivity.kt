@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.animation.AnimationUtils
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -48,10 +49,23 @@ class MainActivity : AppCompatActivity(){
             startActivity<CreatePhotoItemActivity>()
         })
 
+        viewModel.navigateToFile.observe(this, EventObserver{
+            Toast.makeText(this, "Add file clicked!", Toast.LENGTH_LONG).show()
+        })
+
+        viewModel.navigateToAudio.observe(this, EventObserver{
+            Toast.makeText(this, "Add audio clicked!", Toast.LENGTH_LONG).show()
+        })
+
         viewModel.openFabs.observe(this, Observer { openFabs ->
             if(openFabs) animateFabs(R.anim.rotate_anticlockwise, R.anim.fab_open)
             else animateFabs(R.anim.rotate_clockwise, R.anim.fab_close)
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.reloadItems()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

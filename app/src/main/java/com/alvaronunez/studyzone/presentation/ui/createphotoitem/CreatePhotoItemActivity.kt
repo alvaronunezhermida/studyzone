@@ -8,6 +8,7 @@ import android.graphics.Matrix
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.databinding.DataBindingUtil
@@ -49,6 +50,10 @@ class CreatePhotoItemActivity : AppCompatActivity() {
     private fun setupObservers() {
         viewModel.takePhoto.observe(this, EventObserver{
             openCamera()
+        })
+
+        viewModel.addItem.observe(this, EventObserver{
+            Toast.makeText(this, "Add item clicked!", Toast.LENGTH_LONG).show()
         })
     }
 

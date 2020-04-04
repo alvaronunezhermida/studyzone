@@ -54,6 +54,7 @@
             app:layout_constraintBottom_toTopOf="@id/fab_audio"
             app:layout_constraintEnd_toEndOf="@id/fab_audio"
             app:layout_constraintStart_toStartOf="@id/fab_audio"
+            android:onClick="@{() -> viewmodel.onFabFileItemClicked()}"
             app:pressedTranslationZ="12dp" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -66,6 +67,7 @@
             app:layout_constraintBottom_toTopOf="@id/fab_image"
             app:layout_constraintEnd_toEndOf="@id/fab_image"
             app:layout_constraintStart_toStartOf="@id/fab_image"
+            android:onClick="@{() -> viewmodel.onFabAudioItemClicked()}"
             app:pressedTranslationZ="12dp" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
